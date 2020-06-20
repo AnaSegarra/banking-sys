@@ -10,38 +10,40 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "checking_accounts")
 public class CheckingAccount extends Account {
-    private BigDecimal monthlyMaintenanceFee;
-    private BigDecimal minimumBalance;
+    private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");
+    private final BigDecimal minimumBalance = new BigDecimal("250");
 
-    public CheckingAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                           Money balance, BigDecimal penaltyFee, int secretKey,
-                           BigDecimal monthlyMaintenanceFee, BigDecimal minimumBalance) {
-        super(primaryOwner, secondaryOwner, balance, penaltyFee, secretKey);
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-        this.minimumBalance = minimumBalance;
+    public CheckingAccount() {
     }
 
-    public CheckingAccount(AccountHolder primaryOwner, Money balance, BigDecimal penaltyFee,
-                           int secretKey, Status status, BigDecimal monthlyMaintenanceFee,
-                           BigDecimal minimumBalance) {
-        super(primaryOwner, balance, penaltyFee, secretKey, status);
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-        this.minimumBalance = minimumBalance;
+    public CheckingAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner,
+                           Money balance, int secretKey) {
+        super(primaryOwner, secondaryOwner, balance, secretKey);
+    }
+
+    public CheckingAccount(AccountHolder primaryOwner, Money balance, int secretKey) {
+        super(primaryOwner, balance, secretKey);
     }
 
     public BigDecimal getMonthlyMaintenanceFee() {
         return monthlyMaintenanceFee;
     }
 
-    public void setMonthlyMaintenanceFee(BigDecimal monthlyMaintenanceFee) {
-        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
-    }
-
     public BigDecimal getMinimumBalance() {
         return minimumBalance;
     }
 
-    public void setMinimumBalance(BigDecimal minimumBalance) {
-        this.minimumBalance = minimumBalance;
+    @Override
+    public String toString() {
+        return "CheckingAccount{" +
+                "monthlyMaintenanceFee=" + monthlyMaintenanceFee +
+                ", minimumBalance=" + minimumBalance +
+                ", primaryOwner=" + primaryOwner +
+                ", secondaryOwner=" + secondaryOwner +
+                ", balance=" + balance +
+                ", penaltyFee=" + penaltyFee +
+                ", secretKey=" + secretKey +
+                ", status=" + status +
+                '}';
     }
 }

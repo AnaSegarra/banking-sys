@@ -1,8 +1,13 @@
 package com.segarra.bankingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.segarra.bankingsystem.utils.Address;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,13 +17,17 @@ public class AccountHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    @NotBlank(message = "Name is required")
     private String name;
+    @NotNull(message = "Birthday is required")
     private LocalDate birthday;
 
+    @Valid
+    @NotNull(message = "A primary address is required")
     @Embedded
     private Address primaryAddress;
 
+    @Valid
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "country", column = @Column(name = "mail_country")),
@@ -30,9 +39,11 @@ public class AccountHolder {
     private Address mailingAddress;
 
     @OneToMany(mappedBy = "primaryOwner")
+    @JsonIgnore
     private List<CreditCard> accounts;
 
     @OneToMany(mappedBy = "secondaryOwner")
+    @JsonIgnore
     private List<CreditCard> secondaryAccounts;
 
     public AccountHolder() {

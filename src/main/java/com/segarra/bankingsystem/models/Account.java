@@ -24,30 +24,29 @@ public abstract class Account {
     @Embedded
     protected Money balance;
 
-    protected BigDecimal penaltyFee;
+    protected final BigDecimal penaltyFee = new BigDecimal("40");
     protected int secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
 
     public Account() {
+        this.status = Status.ACTIVE;
     }
 
     public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                   Money balance, BigDecimal penaltyFee, int secretKey) {
+                   Money balance, int secretKey) {
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;
-        this.penaltyFee = penaltyFee;
         this.secretKey = secretKey;
         this.status = Status.ACTIVE;
     }
 
-    public Account(AccountHolder primaryOwner, Money balance, BigDecimal penaltyFee, int secretKey, Status status) {
+    public Account(AccountHolder primaryOwner, Money balance, int secretKey) {
         this.primaryOwner = primaryOwner;
         this.balance = balance;
-        this.penaltyFee = penaltyFee;
         this.secretKey = secretKey;
-        this.status = status;
+        this.status = Status.ACTIVE;
     }
 
     public int getId() {
@@ -84,10 +83,6 @@ public abstract class Account {
 
     public BigDecimal getPenaltyFee() {
         return penaltyFee;
-    }
-
-    public void setPenaltyFee(BigDecimal penaltyFee) {
-        this.penaltyFee = penaltyFee;
     }
 
     public int getSecretKey() {

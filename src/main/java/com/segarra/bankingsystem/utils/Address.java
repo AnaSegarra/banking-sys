@@ -1,14 +1,26 @@
 package com.segarra.bankingsystem.utils;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 @Embeddable
 public class Address {
+    @NotBlank(message = "Country is required")
     private String country;
+    @NotBlank(message = "City is required")
     private String city;
+    @NotBlank(message = "Street name is required")
     private String street;
+    @Digits(integer = 3, fraction = 0, message = "Valid street number is required")
+    @Min(1)
     private int number;
+    @NotBlank(message = "Zip code is required")
     private String zipCode;
+
+    public Address() {
+    }
 
     public Address(String country, String city, String street, int number, String zipCode) {
         this.country = country;

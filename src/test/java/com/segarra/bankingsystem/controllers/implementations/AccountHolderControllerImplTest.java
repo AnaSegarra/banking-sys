@@ -59,7 +59,7 @@ class AccountHolderControllerImplTest {
 
     @Test
     @DisplayName("Test post request to create a new account holder")
-    void create() throws Exception {
+    void create_validInput() throws Exception {
         MvcResult result = mockMvc.perform(post("/users")
                 .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
                         "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
@@ -67,5 +67,14 @@ class AccountHolderControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Madrid"));
+    }
+
+    @Test
+    @DisplayName("Test post request to create a new account holder without primary address, expected 400 status code")
+    void create_NullPrimaryAddress() throws Exception {
+        MvcResult result = mockMvc.perform(post("/users")
+                .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest()).andReturn();
     }
 }

@@ -79,7 +79,6 @@ class CheckingAccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a checking account")
     void create_validNewCheckingAccount() throws Exception {
-
         MvcResult result = mockMvc.perform(post("/checking-accounts")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -100,10 +99,19 @@ class CheckingAccountControllerImplTest {
     }
 
     @Test
-    @DisplayName("Test post request with wrong id, expected 404 status code")
-    void create_invalidId() throws Exception {
+    @DisplayName("Test post request with wrong primary owner id, expected 400 status code")
+    void create_invalidPrimaryOwnerId() throws Exception {
         mockMvc.perform(post("/checking-accounts")
-                .content("{\"primaryOwnerId\": 20,\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .content("{\"primaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test post request with wrong secondary owner id, expected 400 status code")
+    void create_invalidSecondaryOwnerId() throws Exception {
+        mockMvc.perform(post("/checking-accounts")
+                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secondaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

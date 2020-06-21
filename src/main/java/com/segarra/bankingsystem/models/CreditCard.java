@@ -3,74 +3,50 @@ package com.segarra.bankingsystem.models;
 import com.segarra.bankingsystem.utils.Money;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "credit_cards")
-public class CreditCard {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @ManyToOne
-    @JoinColumn(name = "primary_owner")
-    private AccountHolder primaryOwner;
-
-    @ManyToOne
-    @JoinColumn(name = "secondary_owner")
-    private AccountHolder secondaryOwner;
-
-    @Embedded
-    private Money balance;
-
+public class CreditCard extends Account {
+    @DecimalMin(value = "100", message = "Credit limit must be above 100")
+    @DecimalMax(value = "100000", message = "Credit limit must be below 100000")
     private BigDecimal creditLimit;
+    @DecimalMin(value = "0.1", message = "Interest rate must be above 0.1")
+    @DecimalMax(value = "0.2", message = "Interest rate must be below 0.2")
     private BigDecimal interestRate;
-    private BigDecimal penaltyFee;
 
     public CreditCard() {
+        setCreditLimit(creditLimit);
+        setInterestRate(interestRate);
     }
 
-    public CreditCard(AccountHolder primaryOwner, Money balance,
-                      BigDecimal creditLimit, BigDecimal interestRate, BigDecimal penaltyFee) {
-        this.primaryOwner = primaryOwner;
-        this.balance = balance;
-        this.creditLimit = creditLimit;
-        this.interestRate = interestRate;
-        this.penaltyFee = penaltyFee;
+    public CreditCard(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, BigDecimal creditLimit, BigDecimal interestRate) {
+        super(primaryOwner, secondaryOwner, balance);
+        setCreditLimit(creditLimit);
+        setInterestRate(interestRate);
     }
 
-    public CreditCard(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                      Money balance, BigDecimal creditLimit,
-                      BigDecimal interestRate, BigDecimal penaltyFee) {
-        this.primaryOwner = primaryOwner;
-        this.secondaryOwner = secondaryOwner;
-        this.balance = balance;
-        this.creditLimit = creditLimit;
-        this.interestRate = interestRate;
-        this.penaltyFee = penaltyFee;
+    public CreditCard(AccountHolder primaryOwner, Money balance, BigDecimal creditLimit, BigDecimal interestRate) {
+        super(primaryOwner, balance);
+        setCreditLimit(creditLimit);
+        setInterestRate(interestRate);
     }
 
-    public int getId() {
-        return id;
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setCreditLimit(BigDecimal creditLimit) {
+        this.creditLimit = creditLimit == null ? new BigDecimal("100") : creditLimit;
     }
 
-    public AccountHolder getPrimaryOwner() {
-        return primaryOwner;
+    public BigDecimal getInterestRate() {
+        return interestRate;
     }
 
-    public void setPrimaryOwner(AccountHolder primaryOwner) {
-        this.primaryOwner = primaryOwner;
-    }
-
-    public AccountHolder getSecondaryOwner() {
-        return secondaryOwner;
-    }
-
-    public void setSecondaryOwner(AccountHolder secondaryOwner) {
-        this.secondaryOwner = secondaryOwner;
+    public void setInterestRate(BigDecimal interestRate) {
+        this.interestRate = interestRate == null ? new BigDecimal("0.2") : interestRate;
     }
 }

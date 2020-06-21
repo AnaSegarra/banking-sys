@@ -1,8 +1,13 @@
 package com.segarra.bankingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.segarra.bankingsystem.utils.Address;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,13 +17,17 @@ public class AccountHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    @NotBlank(message = "Name is required")
     private String name;
+    @NotNull(message = "Birthday is required")
     private LocalDate birthday;
 
+    @Valid
+    @NotNull(message = "A primary address is required")
     @Embedded
     private Address primaryAddress;
 
+    @Valid
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "country", column = @Column(name = "mail_country")),
@@ -30,10 +39,12 @@ public class AccountHolder {
     private Address mailingAddress;
 
     @OneToMany(mappedBy = "primaryOwner")
-    private List<CreditCard> accounts;
+    @JsonIgnore
+    private List<Account> accounts;
 
     @OneToMany(mappedBy = "secondaryOwner")
-    private List<CreditCard> secondaryAccounts;
+    @JsonIgnore
+    private List<Account> secondaryAccounts;
 
     public AccountHolder() {
     }
@@ -59,19 +70,19 @@ public class AccountHolder {
         this.id = id;
     }
 
-    public List<CreditCard> getAccounts() {
+    public List<Account> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<CreditCard> accounts) {
+    public void setAccounts(List<Account> accounts) {
         this.accounts = accounts;
     }
 
-    public List<CreditCard> getSecondaryAccounts() {
+    public List<Account> getSecondaryAccounts() {
         return secondaryAccounts;
     }
 
-    public void setSecondaryAccounts(List<CreditCard> secondaryAccounts) {
+    public void setSecondaryAccounts(List<Account> secondaryAccounts) {
         this.secondaryAccounts = secondaryAccounts;
     }
 

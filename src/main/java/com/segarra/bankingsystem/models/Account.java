@@ -1,6 +1,5 @@
 package com.segarra.bankingsystem.models;
 
-import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.utils.Money;
 
 import javax.persistence.*;
@@ -24,30 +23,21 @@ public abstract class Account {
     @Embedded
     protected Money balance;
 
-    protected BigDecimal penaltyFee;
-    protected int secretKey;
-    @Enumerated(value = EnumType.STRING)
-    protected Status status;
+    protected final BigDecimal penaltyFee = new BigDecimal("40");
 
     public Account() {
     }
 
     public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                   Money balance, BigDecimal penaltyFee, int secretKey) {
+                   Money balance) {
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;
-        this.penaltyFee = penaltyFee;
-        this.secretKey = secretKey;
-        this.status = Status.ACTIVE;
     }
 
-    public Account(AccountHolder primaryOwner, Money balance, BigDecimal penaltyFee, int secretKey, Status status) {
+    public Account(AccountHolder primaryOwner, Money balance) {
         this.primaryOwner = primaryOwner;
         this.balance = balance;
-        this.penaltyFee = penaltyFee;
-        this.secretKey = secretKey;
-        this.status = status;
     }
 
     public int getId() {
@@ -84,25 +74,5 @@ public abstract class Account {
 
     public BigDecimal getPenaltyFee() {
         return penaltyFee;
-    }
-
-    public void setPenaltyFee(BigDecimal penaltyFee) {
-        this.penaltyFee = penaltyFee;
-    }
-
-    public int getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(int secretKey) {
-        this.secretKey = secretKey;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 }

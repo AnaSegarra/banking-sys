@@ -7,40 +7,28 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 
 @Entity
-@Table(name = "checking_accounts")
-public class CheckingAccount extends Account {
-    private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");
-    private final BigDecimal minimumBalance = new BigDecimal("250");
+@Table(name = "student_accounts")
+public class StudentAccount extends Account {
     protected int secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
 
-    public CheckingAccount() {
+    public StudentAccount() {
         this.status = Status.ACTIVE;
     }
 
-    public CheckingAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                           Money balance, int secretKey) {
+    public StudentAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, int secretKey) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         this.status = Status.ACTIVE;
     }
 
-    public CheckingAccount(AccountHolder primaryOwner, Money balance, int secretKey) {
+    public StudentAccount(AccountHolder primaryOwner, Money balance, int secretKey) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
         this.status = Status.ACTIVE;
-    }
-
-    public BigDecimal getMonthlyMaintenanceFee() {
-        return monthlyMaintenanceFee;
-    }
-
-    public BigDecimal getMinimumBalance() {
-        return minimumBalance;
     }
 
     public int getSecretKey() {
@@ -61,10 +49,8 @@ public class CheckingAccount extends Account {
 
     @Override
     public String toString() {
-        return "CheckingAccount{" +
-                "monthlyMaintenanceFee=" + monthlyMaintenanceFee +
-                ", minimumBalance=" + minimumBalance +
-                ", primaryOwner=" + primaryOwner +
+        return "StudentAccount{" +
+                "primaryOwner=" + primaryOwner +
                 ", secondaryOwner=" + secondaryOwner +
                 ", balance=" + balance +
                 ", penaltyFee=" + penaltyFee +

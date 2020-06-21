@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-class AccountHolderImplTest {
+class AccountHolderControllerImplTest {
     @Autowired
     private AccountHolderRepository accountHolderRepository;
     @Autowired

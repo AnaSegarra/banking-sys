@@ -2,8 +2,6 @@ package com.segarra.bankingsystem.dto;
 
 import com.segarra.bankingsystem.utils.Money;
 
-import java.math.BigDecimal;
-
 public class CheckingAccountBody {
     private int primaryOwnerId;
     private int secondaryOwnerId;

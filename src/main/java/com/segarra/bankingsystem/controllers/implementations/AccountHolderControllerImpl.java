@@ -11,7 +11,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-public class AccountHolderImpl implements AccountHolderController {
+public class AccountHolderControllerImpl implements AccountHolderController {
     @Autowired
     AccountHolderService accountHolderService;
 

@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-class CheckingAccountImplTest {
+class CheckingAccountControllerImplTest {
     @Autowired
     private CheckingAccountRepository checkingAccountRepository;
     @Autowired

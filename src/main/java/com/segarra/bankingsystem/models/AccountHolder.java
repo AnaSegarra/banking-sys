@@ -40,11 +40,11 @@ public class AccountHolder {
 
     @OneToMany(mappedBy = "primaryOwner")
     @JsonIgnore
-    private List<CreditCard> accounts;
+    private List<Account> accounts;
 
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
-    private List<CreditCard> secondaryAccounts;
+    private List<Account> secondaryAccounts;
 
     public AccountHolder() {
     }
@@ -70,19 +70,19 @@ public class AccountHolder {
         this.id = id;
     }
 
-    public List<CreditCard> getAccounts() {
+    public List<Account> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<CreditCard> accounts) {
+    public void setAccounts(List<Account> accounts) {
         this.accounts = accounts;
     }
 
-    public List<CreditCard> getSecondaryAccounts() {
+    public List<Account> getSecondaryAccounts() {
         return secondaryAccounts;
     }
 
-    public void setSecondaryAccounts(List<CreditCard> secondaryAccounts) {
+    public void setSecondaryAccounts(List<Account> secondaryAccounts) {
         this.secondaryAccounts = secondaryAccounts;
     }
 

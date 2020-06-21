@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class StudentAccountImpl implements StudentAccountController {
+public class StudentAccountControllerImpl implements StudentAccountController {
     @Autowired
     StudentAccountService studentAccountService;
 

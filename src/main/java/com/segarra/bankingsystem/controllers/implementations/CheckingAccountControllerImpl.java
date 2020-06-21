@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-public class CheckingAccountImpl implements CheckingAccountController {
+public class CheckingAccountControllerImpl implements CheckingAccountController {
     @Autowired
     CheckingAccountService checkingAccountService;
 
@@ -27,7 +26,7 @@ public class CheckingAccountImpl implements CheckingAccountController {
     @Override
     @PostMapping("/checking-accounts")
     @ResponseStatus(HttpStatus.CREATED)
-    public CheckingAccountMV create(@Valid @RequestBody CheckingAccountBody checkingAccount) {
+    public CheckingAccountMV create(@RequestBody CheckingAccountBody checkingAccount) {
         return checkingAccountService.create(checkingAccount);
     }
 }

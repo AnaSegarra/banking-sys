@@ -4,6 +4,8 @@ import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.utils.Money;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
@@ -12,17 +14,25 @@ import java.math.BigDecimal;
 public class CheckingAccount extends Account {
     private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");
     private final BigDecimal minimumBalance = new BigDecimal("250");
+    protected int secretKey;
+    @Enumerated(value = EnumType.STRING)
+    protected Status status;
 
     public CheckingAccount() {
+        this.status = Status.ACTIVE;
     }
 
     public CheckingAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner,
                            Money balance, int secretKey) {
-        super(primaryOwner, secondaryOwner, balance, secretKey);
+        super(primaryOwner, secondaryOwner, balance);
+        this.secretKey = secretKey;
+        this.status = Status.ACTIVE;
     }
 
     public CheckingAccount(AccountHolder primaryOwner, Money balance, int secretKey) {
-        super(primaryOwner, balance, secretKey);
+        super(primaryOwner, balance);
+        this.secretKey = secretKey;
+        this.status = Status.ACTIVE;
     }
 
     public BigDecimal getMonthlyMaintenanceFee() {
@@ -31,6 +41,22 @@ public class CheckingAccount extends Account {
 
     public BigDecimal getMinimumBalance() {
         return minimumBalance;
+    }
+
+    public int getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(int secretKey) {
+        this.secretKey = secretKey;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override

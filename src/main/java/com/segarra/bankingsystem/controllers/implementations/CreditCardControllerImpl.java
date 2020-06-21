@@ -26,7 +26,7 @@ public class CreditCardControllerImpl implements CreditCardController {
     @Override
     @PostMapping("/credit-cards")
     @ResponseStatus(HttpStatus.CREATED)
-    public CreditCard create(@RequestBody CreditCardBody newCard) {
+    public CreditCard create(@Valid @RequestBody CreditCardBody newCard) {
         return creditCardService.create(newCard);
     }
 }

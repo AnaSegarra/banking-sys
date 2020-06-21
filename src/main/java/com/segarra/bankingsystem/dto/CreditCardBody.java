@@ -2,34 +2,22 @@ package com.segarra.bankingsystem.dto;
 
 import com.segarra.bankingsystem.utils.Money;
 
-import javax.validation.Valid;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
 public class CreditCardBody {
     private int primaryOwnerId;
     private int secondaryOwnerId;
     private Money balance;
+    @DecimalMin(value = "100", message = "Credit limit must be above 100")
+    @DecimalMax(value = "100000", message = "Credit limit must be below 100000")
     private BigDecimal creditLimit;
+    @DecimalMin(value = "0.1", message = "Interest rate must be above 0.1")
+    @DecimalMax(value = "0.2", message = "Interest rate must be below 0.2")
     private BigDecimal interestRate;
 
     public CreditCardBody() {
-    }
-
-    public CreditCardBody(int primaryOwnerId, int secondaryOwnerId, Money balance,
-                          BigDecimal creditLimit, BigDecimal interestRate) {
-        this.primaryOwnerId = primaryOwnerId;
-        this.secondaryOwnerId = secondaryOwnerId;
-        this.balance = balance;
-        this.creditLimit = creditLimit;
-        this.interestRate = interestRate;
-    }
-
-    public CreditCardBody(int primaryOwnerId, Money balance, BigDecimal creditLimit,
-                          BigDecimal interestRate) {
-        this.primaryOwnerId = primaryOwnerId;
-        this.balance = balance;
-        this.creditLimit = creditLimit;
-        this.interestRate = interestRate;
     }
 
     public int getPrimaryOwnerId() {

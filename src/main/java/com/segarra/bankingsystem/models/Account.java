@@ -75,4 +75,11 @@ public abstract class Account {
     public BigDecimal getPenaltyFee() {
         return penaltyFee;
     }
+
+    public void applyPenaltyFee(BigDecimal minimumBalance){
+        // balance below minimumBalance results in a deduction of the penalty fee
+        if(balance.getAmount().compareTo(minimumBalance) < 0){
+            balance.decreaseAmount(penaltyFee);
+        }
+    };
 }

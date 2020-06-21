@@ -10,7 +10,7 @@ import java.io.IOException;
 public class GlobalHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public void handleDataNotFoundException(ResourceNotFoundException e, HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
 
 }

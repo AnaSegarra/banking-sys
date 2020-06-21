@@ -1,6 +1,5 @@
 package com.segarra.bankingsystem.services;
 
-import com.segarra.bankingsystem.models.CheckingAccount;
 import com.segarra.bankingsystem.models.StudentAccount;
 import com.segarra.bankingsystem.repositories.StudentAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;

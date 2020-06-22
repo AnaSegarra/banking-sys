@@ -13,9 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -74,45 +72,5 @@ class CheckingAccountControllerImplTest {
     @DisplayName("Test get request to retrieve all checking accounts")
     void getAll() throws Exception {
         mockMvc.perform(get("/checking-accounts")).andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("Test post request to create a checking account")
-    void create_validNewCheckingAccount() throws Exception {
-        MvcResult result = mockMvc.perform(post("/checking-accounts")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andReturn();
-        // minimum balance field is only present in checking accounts
-        assertTrue(result.getResponse().getContentAsString().contains("minimumBalance"));
-    }
-
-    @Test
-    @DisplayName("Test post request to create a student checking account when primary account holder is under 24")
-    void create_validNewStudentCheckingAccount() throws Exception {
-        MvcResult result = mockMvc.perform(post("/checking-accounts")
-                .content("{\"primaryOwnerId\":" + youngAccHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andReturn();
-        // should create a student checking account which doesn't have a minimum balance
-        assertFalse(result.getResponse().getContentAsString().contains("minimumBalance"));
-    }
-
-    @Test
-    @DisplayName("Test post request with wrong primary owner id, expected 400 status code")
-    void create_invalidPrimaryOwnerId() throws Exception {
-        mockMvc.perform(post("/checking-accounts")
-                .content("{\"primaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Test post request with wrong secondary owner id, expected 400 status code")
-    void create_invalidSecondaryOwnerId() throws Exception {
-        mockMvc.perform(post("/checking-accounts")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secondaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
     }
 }

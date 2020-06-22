@@ -1,12 +1,9 @@
 package com.segarra.bankingsystem.services;
 
 import com.segarra.bankingsystem.models.AccountHolder;
-import com.segarra.bankingsystem.models.CheckingAccount;
-import com.segarra.bankingsystem.models.CreditCard;
+import com.segarra.bankingsystem.models.SavingsAccount;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
-import com.segarra.bankingsystem.repositories.CheckingAccountRepository;
-import com.segarra.bankingsystem.repositories.CreditCardRepository;
-import com.segarra.bankingsystem.repositories.StudentAccountRepository;
+import com.segarra.bankingsystem.repositories.SavingsAccountRepository;
 import com.segarra.bankingsystem.utils.Address;
 import com.segarra.bankingsystem.utils.Money;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,16 +22,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class CreditCardServiceTest {
+class SavingsAccountServiceTest {
     @Autowired
-    private CreditCardService creditCardService;
+    private SavingsAccountService savingsAccountService;
 
     @MockBean
-    private CreditCardRepository creditCardRepository;
+    private SavingsAccountRepository savingsAccountRepository;
     @MockBean
     private AccountHolderRepository accountHolderRepository;
 
-    private List<CreditCard> creditCardList;
+    private List<SavingsAccount> savingsAccountList;
 
     @BeforeEach
     void setUp() {
@@ -43,17 +40,17 @@ class CreditCardServiceTest {
         AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"));
 
-        CreditCard creditCard = new CreditCard(accountHolder2,
-                new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));
-        CreditCard creditCard2 = new CreditCard(accountHolder2,
-                new Money(new BigDecimal("5000")), new BigDecimal("300"), new BigDecimal("0.15"));
-        creditCardList = Arrays.asList(creditCard, creditCard2);
+        SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,
+                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
+        SavingsAccount savingsAccount2 = new SavingsAccount(accountHolder,
+                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), 1234, new BigDecimal("800"));
+        savingsAccountList = Arrays.asList(savingsAccount, savingsAccount2);
     }
 
     @Test
-    @DisplayName("Unit test - retrieval of all credit cards")
+    @DisplayName("Unit test - retrieval of all savings accounts")
     void getAll() {
-        when(creditCardRepository.findAll()).thenReturn(creditCardList);
-        assertEquals(2, creditCardService.getAll().size());
+        when(savingsAccountRepository.findAll()).thenReturn(savingsAccountList);
+        assertEquals(2, savingsAccountService.getAll().size());
     }
 }

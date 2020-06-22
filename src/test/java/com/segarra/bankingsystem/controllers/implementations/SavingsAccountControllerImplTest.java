@@ -1,9 +1,9 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.models.AccountHolder;
-import com.segarra.bankingsystem.models.CreditCard;
+import com.segarra.bankingsystem.models.SavingsAccount;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
-import com.segarra.bankingsystem.repositories.CreditCardRepository;
+import com.segarra.bankingsystem.repositories.SavingsAccountRepository;
 import com.segarra.bankingsystem.utils.Address;
 import com.segarra.bankingsystem.utils.Money;
 import org.junit.jupiter.api.AfterEach;
@@ -12,11 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -26,45 +22,47 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class CreditCardControllerImplTest {
+class SavingsAccountControllerImplTest {
     @Autowired
-    private CreditCardRepository creditCardRepository;
+    private SavingsAccountRepository savingsAccountRepository;
     @Autowired
     private AccountHolderRepository accountHolderRepository;
 
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    private AccountHolder accountHolder;
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
-        accountHolder = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
+        AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"));
-        AccountHolder accountHolder2 = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
+        AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"));
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
-        CreditCard creditCard = new CreditCard(accountHolder, new Money(new BigDecimal("4000")), new BigDecimal("200"), new BigDecimal("0.12"));
-        CreditCard creditCard2 = new CreditCard(accountHolder2, new Money(new BigDecimal("6000")), new BigDecimal("300"), new BigDecimal("0.12"));
-        creditCardRepository.saveAll(Stream.of(creditCard, creditCard2).collect(Collectors.toList()));
+        SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,
+                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
+        SavingsAccount savingsAccount2 = new SavingsAccount(accountHolder,
+                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), 1234, new BigDecimal("800"));
+
+        savingsAccountRepository.saveAll(Stream.of(savingsAccount, savingsAccount2).collect(Collectors.toList()));
     }
 
     @AfterEach
     void tearDown() {
-        creditCardRepository.deleteAll();
+        savingsAccountRepository.deleteAll();
         accountHolderRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("Test get request to retrieve all credit cards")
+    @DisplayName("Test get request to retrieve all savings accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/credit-cards")).andExpect(status().isOk());
+        mockMvc.perform(get("/savings-accounts")).andExpect(status().isOk());
     }
 }

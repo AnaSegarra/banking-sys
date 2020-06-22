@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public abstract class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    protected int id;
     @ManyToOne
     @JoinColumn(name = "primary_owner")
     protected AccountHolder primaryOwner;

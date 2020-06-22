@@ -21,12 +21,10 @@ public class AccountHolder {
     private String name;
     @NotNull(message = "Birthday is required")
     private LocalDate birthday;
-
     @Valid
     @NotNull(message = "A primary address is required")
     @Embedded
     private Address primaryAddress;
-
     @Valid
     @Embedded
     @AttributeOverrides({
@@ -37,29 +35,31 @@ public class AccountHolder {
             @AttributeOverride(name = "zipCode", column = @Column(name = "mail_zip_code"))
     })
     private Address mailingAddress;
-
     @OneToMany(mappedBy = "primaryOwner")
     @JsonIgnore
     private List<Account> accounts;
-
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
     private List<Account> secondaryAccounts;
+    @NotNull(message = "A password is required")
+    private String password;
 
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password) {
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
+        this.password = password;
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, Address mailingAddress) {
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
+        this.password = password;
     }
 
     public int getId() {
@@ -116,6 +116,14 @@ public class AccountHolder {
 
     public void setMailingAddress(Address mailingAddress) {
         this.mailingAddress = mailingAddress;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
 

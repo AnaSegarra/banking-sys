@@ -18,8 +18,8 @@ public class AccountControllerImpl implements AccountController {
     @Override
     @PostMapping("/accounts")
     @ResponseStatus(HttpStatus.CREATED)
-    public <T extends Account> Account create(@RequestParam(name = "type") String accountType,
-                                              @Valid @RequestBody AccountBody newAccount) {
+    public Account create(@RequestParam(name = "type") String accountType,
+                          @Valid @RequestBody AccountBody newAccount) {
         return accountService.create(accountType, newAccount);
     }
 }

@@ -1,7 +1,11 @@
 package com.segarra.bankingsystem.models;
 
+import com.segarra.bankingsystem.utils.Money;
+
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
@@ -16,15 +20,18 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "recipient_account_id")
     private Account recipientId;
-    private LocalDate date;
+    private LocalDateTime date;
+    private BigDecimal amount;
 
     public Transaction() {
+        this.date = LocalDateTime.now();
     }
 
-    public Transaction(Account senderId, Account recipientId) {
+    public Transaction(Account senderId, Account recipientId, BigDecimal amount) {
         this.senderId = senderId;
         this.recipientId = recipientId;
-        this.date = LocalDate.now();
+        this.amount = amount;
+        this.date = LocalDateTime.now();
     }
 
     public int getId() {
@@ -51,11 +58,19 @@ public class Transaction {
         this.recipientId = recipientId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }

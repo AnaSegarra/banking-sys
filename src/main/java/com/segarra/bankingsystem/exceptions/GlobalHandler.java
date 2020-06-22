@@ -22,4 +22,9 @@ public class GlobalHandler {
     public void handleInsufficientFundsException(InsufficientFundsException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
+
+    @ExceptionHandler(NotOwnerException.class)
+    public void handleNotOwnerException(NotOwnerException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+    }
 }

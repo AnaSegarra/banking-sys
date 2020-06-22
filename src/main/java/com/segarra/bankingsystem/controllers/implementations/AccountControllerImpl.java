@@ -1,0 +1,25 @@
+package com.segarra.bankingsystem.controllers.implementations;
+
+import com.segarra.bankingsystem.controllers.interfaces.AccountController;
+import com.segarra.bankingsystem.dto.AccountBody;
+import com.segarra.bankingsystem.models.Account;
+import com.segarra.bankingsystem.services.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+public class AccountControllerImpl implements AccountController {
+    @Autowired
+    AccountService accountService;
+
+    @Override
+    @PostMapping("/accounts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public <T extends Account> Account create(@RequestParam(name = "type") String accountType,
+                                              @Valid @RequestBody AccountBody newAccount) {
+        return accountService.create(accountType, newAccount);
+    }
+}

@@ -9,7 +9,12 @@ import java.io.IOException;
 @ControllerAdvice
 public class GlobalHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
-    public void handleDataNotFoundException(ResourceNotFoundException e, HttpServletResponse response) throws IOException {
+    public void handleResourceNotFoundException(ResourceNotFoundException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalAccountTypeException.class)
+    public void handleIllegalAccountTypeException(IllegalAccountTypeException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
 

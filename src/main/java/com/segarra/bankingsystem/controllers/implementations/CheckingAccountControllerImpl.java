@@ -1,8 +1,6 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.CheckingAccountController;
-import com.segarra.bankingsystem.dto.CheckingAccountBody;
-import com.segarra.bankingsystem.dto.CheckingAccountMV;
 import com.segarra.bankingsystem.models.CheckingAccount;
 import com.segarra.bankingsystem.services.CheckingAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +21,4 @@ public class CheckingAccountControllerImpl implements CheckingAccountController 
         return checkingAccountService.getAll();
     }
 
-    @Override
-    @PostMapping("/checking-accounts")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CheckingAccountMV create(@RequestBody CheckingAccountBody checkingAccount) {
-        return checkingAccountService.create(checkingAccount);
-    }
 }

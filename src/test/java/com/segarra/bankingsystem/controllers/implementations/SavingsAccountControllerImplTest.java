@@ -41,9 +41,9 @@ class SavingsAccountControllerImplTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"));
+                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234");
         AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"));
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234");
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
         SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,

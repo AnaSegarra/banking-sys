@@ -63,7 +63,7 @@ class AccountHolderControllerImplTest {
         MvcResult result = mockMvc.perform(post("/api/v1/users")
                 .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
                         "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
-                        "\"number\": 13, \"zipCode\": \"28700\"}, \"password\": \"1234\"}")
+                        "\"number\": 13, \"zipCode\": \"28700\"}, \"password\": \"1234\", \"username\": \"gabi_c\"}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
         assertTrue(result.getResponse().getContentAsString().contains("Madrid"));

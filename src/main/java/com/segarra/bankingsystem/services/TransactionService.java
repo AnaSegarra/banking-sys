@@ -36,7 +36,8 @@ public class TransactionService {
         if(transaction.size() == 0)
             return false;
         System.out.println("la última transacción " + transaction.get(0));
-        int seconds = (int) transaction.get(0).getDate().until(LocalDateTime.now(), ChronoUnit.SECONDS);
+        int seconds = (int) transaction.get(0).getDate().until(date, ChronoUnit.SECONDS);
+        // reset to one after testing
         if(seconds <= 10){
             return true;
         }

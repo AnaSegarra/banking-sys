@@ -22,4 +22,9 @@ public class GlobalHandler {
     public void handleFrozenAccountException(FrozenAccountException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
+    @ExceptionHandler(IllegalInputException.class)
+    public void handleIllegalInputException(IllegalInputException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    }
+
 }

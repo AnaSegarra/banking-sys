@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.services;
 
 import com.segarra.bankingsystem.dto.AccountBody;
-import com.segarra.bankingsystem.exceptions.IllegalAccountTypeException;
+import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.exceptions.ResourceNotFoundException;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
@@ -14,15 +14,15 @@ import java.time.Period;
 @Service
 public class AccountService {
     @Autowired
-    AccountHolderRepository accountHolderRepository;
+    private AccountHolderRepository accountHolderRepository;
     @Autowired
-    CheckingAccountRepository checkingAccountRepository;
+    private CheckingAccountRepository checkingAccountRepository;
     @Autowired
-    StudentAccountRepository studentAccountRepository;
+    private StudentAccountRepository studentAccountRepository;
     @Autowired
-    CreditCardRepository creditCardRepository;
+    private CreditCardRepository creditCardRepository;
     @Autowired
-    SavingsAccountRepository savingsAccountRepository;
+    private SavingsAccountRepository savingsAccountRepository;
 
     public Account create(String accountType, AccountBody newAccount) {
         AccountHolder primaryOwner = accountHolderRepository.findById(newAccount.getPrimaryOwnerId())
@@ -53,7 +53,7 @@ public class AccountService {
                     newAccount.getCreditCardLimit(), newAccount.getCardInterestRate());
             return creditCardRepository.save(creditCard);
         }
-
-        throw new IllegalAccountTypeException("Must enter a valid account type of either savings, checking or credit-card");
+        // throw error if account type doesn't exist
+        throw new IllegalInputException("Must enter a valid account type of either savings, checking or credit-card");
     }
 }

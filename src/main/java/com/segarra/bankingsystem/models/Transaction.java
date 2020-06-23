@@ -73,4 +73,15 @@ public class Transaction {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", senderId=" + senderId +
+                ", recipientId=" + recipientId +
+                ", date=" + date +
+                ", amount=" + amount +
+                '}';
+    }
 }

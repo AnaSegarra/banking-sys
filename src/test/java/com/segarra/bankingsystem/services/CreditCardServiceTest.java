@@ -39,9 +39,9 @@ class CreditCardServiceTest {
     @BeforeEach
     void setUp() {
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
         AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
 
         CreditCard creditCard = new CreditCard(accountHolder2,
                 new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));

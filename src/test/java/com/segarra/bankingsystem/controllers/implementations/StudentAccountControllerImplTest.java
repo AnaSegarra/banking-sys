@@ -39,9 +39,9 @@ class StudentAccountControllerImplTest {
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
         AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "gabi_c");
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,

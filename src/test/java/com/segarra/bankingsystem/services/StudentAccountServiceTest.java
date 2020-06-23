@@ -34,9 +34,9 @@ class StudentAccountServiceTest {
     @BeforeEach
     void setUp() {
         AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
         AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "ana_s");
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,
                 new Money(new BigDecimal("2000")), 1234);

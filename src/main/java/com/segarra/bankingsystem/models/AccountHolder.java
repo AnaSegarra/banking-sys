@@ -41,25 +41,31 @@ public class AccountHolder {
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
     private List<Account> secondaryAccounts;
+
+    // password & username to use as credentials
     @NotNull(message = "A password is required")
     private String password;
+    @NotNull(message = "A username is required")
+    private String username;
 
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username) {
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.password = password;
+        this.username = username;
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, Address mailingAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username, Address mailingAddress) {
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
         this.password = password;
+        this.username = username;
     }
 
     public int getId() {
@@ -124,6 +130,14 @@ public class AccountHolder {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
 

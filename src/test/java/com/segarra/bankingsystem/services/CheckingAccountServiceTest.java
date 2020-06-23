@@ -45,11 +45,11 @@ class CheckingAccountServiceTest {
     @BeforeEach
     void setUp() {
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
         accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234");
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
         youngAccHolder = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-                new Address("Spain", "Madrid", "Luna Avenue", 8, "28200"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 8, "28200"), "1234", "gabi_c");
 
         CheckingAccount checkingAccount = new CheckingAccount(accountHolder2,
                 new Money(new BigDecimal("2000")), 1234);

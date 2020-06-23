@@ -19,15 +19,15 @@ import java.util.List;
 @Service
 public class TransactionService {
     @Autowired
-    SavingsAccountRepository savingsAccountRepository;
+    private SavingsAccountRepository savingsAccountRepository;
     @Autowired
-    CheckingAccountRepository checkingAccountRepository;
+    private CheckingAccountRepository checkingAccountRepository;
     @Autowired
-    CreditCardRepository creditCardRepository;
+    private CreditCardRepository creditCardRepository;
     @Autowired
-    StudentAccountRepository studentAccountRepository;
+    private StudentAccountRepository studentAccountRepository;
     @Autowired
-    TransactionRepository transactionRepository;
+    private TransactionRepository transactionRepository;
 
     public boolean checkFraud(Account account, LocalDateTime date){
         Pageable item = PageRequest.of(0, 1);
@@ -56,7 +56,7 @@ public class TransactionService {
         if(senderType.equals("savings")){
             SavingsAccount senderAccount = savingsAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getName().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getName().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
@@ -79,7 +79,7 @@ public class TransactionService {
         } else if(senderType.equals("checking")){
             CheckingAccount senderAccount = checkingAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getName().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getName().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
@@ -100,7 +100,7 @@ public class TransactionService {
         } else if(senderType.equals("student")){
             StudentAccount senderAccount = studentAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getName().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getName().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
@@ -121,7 +121,7 @@ public class TransactionService {
         } else if(senderType.equals("credit-card")){
             CreditCard senderAccount = creditCardRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getName().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getName().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
@@ -131,7 +131,7 @@ public class TransactionService {
             senderAccount.getBalance().decreaseAmount(transaction.getAmount());
             creditCardRepository.save(senderAccount);
         } else {
-            throw new IllegalAccountTypeException("Must enter a valid account type of either savings, checking, student or credit-card");
+            throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }
 
         if(recipientType.equals("savings")){
@@ -166,7 +166,7 @@ public class TransactionService {
             recipientAccount.getBalance().increaseAmount(transaction.getAmount());
             creditCardRepository.save(recipientAccount);
         } else {
-            throw new IllegalAccountTypeException("Must enter a valid account type of either savings, checking, student or credit-card");
+            throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }
         transactionRepository.save(newTransaction);
     }

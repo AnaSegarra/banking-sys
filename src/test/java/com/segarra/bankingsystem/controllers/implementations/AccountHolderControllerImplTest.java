@@ -38,10 +38,10 @@ class AccountHolderControllerImplTest {
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"),"1234",
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"),"1234","ana_s",
                 new Address("Spain", "Sabadell", "Carrer de l'Estrella", 6, "08201"));
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28700"), "1234");
+                new Address("Spain", "Madrid", "Luna Avenue", 13, "28700"), "1234", "gema_s");
 
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
     }
@@ -85,6 +85,17 @@ class AccountHolderControllerImplTest {
                 .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
                         "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
                         "\"number\": 13, \"zipCode\": \"28700\"}}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test post request to create an account holder when username is taken, expected 400 status code")
+    void create_InvalidUsername() throws Exception {
+        mockMvc.perform(post("/api/v1/users")
+                .content("{\"name\": \"Gema\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
+                        "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
+                        "\"number\": 13, \"zipCode\": \"28700\"}, \"password\": \"1234\", \"username\": \"gema_s\"}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface AccountHolderController {
     List<AccountHolder> getAll();
-    void makeTransaction(String senderType, String recipientType, TransactionRequest transaction, User user);
+    AccountHolder create(AccountHolder accountHolder);
 }

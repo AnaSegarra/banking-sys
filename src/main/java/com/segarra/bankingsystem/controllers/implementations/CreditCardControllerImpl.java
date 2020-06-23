@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class CreditCardControllerImpl implements CreditCardController {
     @Autowired
-    CreditCardService creditCardService;
+    private CreditCardService creditCardService;
 
-    @Override
     @GetMapping("/credit-cards")
     @ResponseStatus(HttpStatus.OK)
     public List<CreditCard> getAll() {

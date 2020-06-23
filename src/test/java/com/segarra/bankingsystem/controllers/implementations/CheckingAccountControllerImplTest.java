@@ -71,6 +71,6 @@ class CheckingAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all checking accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/checking-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/checking-accounts")).andExpect(status().isOk());
     }
 }

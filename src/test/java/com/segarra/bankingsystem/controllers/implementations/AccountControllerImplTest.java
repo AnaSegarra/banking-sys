@@ -12,12 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,7 +35,6 @@ class AccountControllerImplTest {
     private CreditCardRepository creditCardRepository;
     @Autowired
     private AccountHolderRepository accountHolderRepository;
-
 
     @Autowired
     private WebApplicationContext wac;
@@ -71,7 +67,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a checking account")
     void create_CheckingAccount() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "checking")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "checking")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON)).
                 andExpect(status().isCreated()).andReturn();
@@ -82,7 +78,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a student checking account when primary account holder is under 24")
     void create_StudentCheckingAccount() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "checking")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "checking")
                 .content("{\"primaryOwnerId\":" + youngAccHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
@@ -93,7 +89,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a credit card with default values for creditLimit and interestRate")
     void createCreditCard_DefaultValues() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "credit-card")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "credit-card")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
@@ -105,7 +101,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a credit card with chosen values for creditLimit and interestRate")
     void createCreditCard_ChosenValues() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "credit-card")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "credit-card")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"creditCardLimit\": 200, \"cardInterestRate\": 0.15}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
@@ -117,7 +113,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a credit card with value above limit for creditLimit, expected 400 status code")
     void createCreditCard_InvalidCreditLimit() throws Exception {
-        mockMvc.perform(post("/accounts").param("type","credit-card")
+        mockMvc.perform(post("/api/v1/accounts").param("type","credit-card")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"creditCardLimit\": 10}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -126,7 +122,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a savings account with default values for minimumBalance and interestRate")
     void createSavingsAccount_DefaultValues() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "savings")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "savings")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
@@ -138,7 +134,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a savings account with chosen values for minimumBalance and interestRate")
     void createSavingsAccount_ChosenValues() throws Exception {
-        MvcResult result = mockMvc.perform(post("/accounts").param("type", "savings")
+        MvcResult result = mockMvc.perform(post("/api/v1/accounts").param("type", "savings")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"savingsInterestRate\": 0.4, \"savingsMinimumBalance\": 800}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
@@ -150,7 +146,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a savings account with value above limit for interestRate, expected 400 status code")
     void createSavingsAccount_InvalidInterestRate() throws Exception {
-        mockMvc.perform(post("/accounts").param("type","savings")
+        mockMvc.perform(post("/api/v1/accounts").param("type","savings")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"savingsInterestRate\": 10}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -161,7 +157,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request with wrong primary owner id, expected 400 status code")
     void create_invalidPrimaryOwnerId() throws Exception {
-        mockMvc.perform(post("/accounts").param("type","checking")
+        mockMvc.perform(post("/api/v1/accounts").param("type","checking")
                 .content("{\"primaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -170,7 +166,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request with wrong secondary owner id, expected 400 status code")
     void create_invalidSecondaryOwnerId() throws Exception {
-        mockMvc.perform(post("/accounts").param("type","checking")
+        mockMvc.perform(post("/api/v1/accounts").param("type","checking")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secondaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -179,7 +175,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request with wrong account type, expected 400 status code")
     void create_invalidAccountType() throws Exception {
-        mockMvc.perform(post("/accounts").param("type", "student-account")
+        mockMvc.perform(post("/api/v1/accounts").param("type", "student-account")
                 .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

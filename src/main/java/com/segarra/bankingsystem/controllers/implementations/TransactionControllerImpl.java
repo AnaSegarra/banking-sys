@@ -10,12 +10,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/v1")
 public class TransactionControllerImpl implements TransactionController {
     @Autowired
-    TransactionService transactionService;
+    private TransactionService transactionService;
 
-    @Override
-    @PostMapping("/users/transactions")
+    @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void makeTransaction(@RequestParam("recipient") String recipientType, @RequestParam("sender") String senderType,
                                 @RequestBody TransactionRequest transaction, @AuthenticationPrincipal User user) {

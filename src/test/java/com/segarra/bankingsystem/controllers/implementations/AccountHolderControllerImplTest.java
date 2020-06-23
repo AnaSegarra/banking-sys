@@ -54,6 +54,38 @@ class AccountHolderControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all account holders")
     void getAll() throws Exception {
-        mockMvc.perform(get("/users")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/users")).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test post request to create a new account holder")
+    void create_validInput() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/v1/users")
+                .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
+                        "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
+                        "\"number\": 13, \"zipCode\": \"28700\"}, \"password\": \"1234\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+        assertTrue(result.getResponse().getContentAsString().contains("Madrid"));
+    }
+
+    @Test
+    @DisplayName("Test post request to create a new account holder without primary address, expected 400 status code")
+    void create_NullPrimaryAddress() throws Exception {
+        mockMvc.perform(post("/api/v1/users")
+                .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"password\": \"1234\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test post request to create a new account holder without password, expected 400 status code")
+    void create_NullPassword() throws Exception {
+        mockMvc.perform(post("/api/v1/users")
+                .content("{\"name\": \"Gabi\", \"birthday\":\"2017-01-10\", \"primaryAddress\": {" +
+                        "\"country\": \"Spain\", \"city\": \"Madrid\", \"street\": \"Luna Avenue\", " +
+                        "\"number\": 13, \"zipCode\": \"28700\"}}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

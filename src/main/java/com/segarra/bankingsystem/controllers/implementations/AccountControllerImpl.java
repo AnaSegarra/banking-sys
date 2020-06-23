@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
+@RequestMapping("/api/v1")
 public class AccountControllerImpl implements AccountController {
     @Autowired
-    AccountService accountService;
+    private AccountService accountService;
 
-    @Override
     @PostMapping("/accounts")
     @ResponseStatus(HttpStatus.CREATED)
     public Account create(@RequestParam(name = "type") String accountType,

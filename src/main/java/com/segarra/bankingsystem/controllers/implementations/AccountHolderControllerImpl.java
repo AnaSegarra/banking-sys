@@ -11,18 +11,17 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class AccountHolderControllerImpl implements AccountHolderController {
     @Autowired
-    AccountHolderService accountHolderService;
+    private AccountHolderService accountHolderService;
 
-    @Override
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<AccountHolder> getAll() {
         return accountHolderService.getAll();
     }
 
-    @Override
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public AccountHolder create(@Valid @RequestBody AccountHolder accountHolder) {

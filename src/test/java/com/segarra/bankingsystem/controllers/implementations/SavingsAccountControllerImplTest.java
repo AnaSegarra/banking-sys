@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,6 +62,6 @@ class SavingsAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all savings accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/savings-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/savings-accounts")).andExpect(status().isOk());
     }
 }

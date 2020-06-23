@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class SavingsAccountControllerImpl implements SavingsAccountController {
     @Autowired
-    SavingsAccountService savingsAccountService;
+    private SavingsAccountService savingsAccountService;
 
-    @Override
     @GetMapping("/savings-accounts")
     @ResponseStatus(HttpStatus.OK)
     public List<SavingsAccount> getAll() {

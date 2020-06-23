@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1")
 public class CheckingAccountControllerImpl implements CheckingAccountController {
     @Autowired
-    CheckingAccountService checkingAccountService;
+    private CheckingAccountService checkingAccountService;
 
-    @Override
     @GetMapping("/checking-accounts")
     @ResponseStatus(HttpStatus.OK)
     public List<CheckingAccount> getAll() {

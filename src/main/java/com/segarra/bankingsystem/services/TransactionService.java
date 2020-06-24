@@ -30,15 +30,19 @@ public class TransactionService {
     public boolean checkFraud(Account account, LocalDateTime date, BigDecimal transaction){
         BigDecimal highest = transactionRepository.findHighestDailyTransactionByCustomer(date, account);
         BigDecimal currentTotal = transactionRepository.findTodayTotalTransactions(date, account);
-        //
+        LocalDateTime lastTransaction =  transactionRepository.findLastTransaction(account);
+        if(currentTotal == null || lastTransaction == null){
+            return false;
+        }
+
+        /* freeze account in case today's transactions add to more than 150% of the highest daily total
+           transactions any other day
+        */
         if(highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
             return true;
         }
 
-        LocalDateTime lastTransaction =  transactionRepository.findLastTransaction(account);
-        if(lastTransaction == null){
-            return false;
-        }
+        // freeze account if two transactions happened in less than a second
         int seconds = (int) lastTransaction.until(date, ChronoUnit.SECONDS);
         // set to one after testing
         return seconds <= 10;

@@ -6,16 +6,13 @@ import com.segarra.bankingsystem.exceptions.*;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 public class TransactionService {
@@ -30,20 +27,21 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public boolean checkFraud(Account account, LocalDateTime date){
-        Pageable item = PageRequest.of(0, 1);
-        List<Transaction> transaction = transactionRepository.findLastTransaction(account, item);
-        System.out.println("hay transacciones? " + transaction.size());
-        if(transaction.size() == 0)
-            return false;
-        System.out.println("la última transacción " + transaction.get(0));
-        int seconds = (int) transaction.get(0).getDate().until(date, ChronoUnit.SECONDS);
-        System.out.println("el tiempo que ha pasado desde la última transacción es de " + seconds);
-        // reset to one after testing
-        if(seconds <= 10){
+    public boolean checkFraud(Account account, LocalDateTime date, BigDecimal transaction){
+        BigDecimal highest = transactionRepository.findHighestDailyTransactionByCustomer(date, account);
+        BigDecimal currentTotal = transactionRepository.findTodayTotalTransactions(date, account);
+        //
+        if(highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
             return true;
         }
-        return false;
+
+        LocalDateTime lastTransaction =  transactionRepository.findLastTransaction(account);
+        if(lastTransaction == null){
+            return false;
+        }
+        int seconds = (int) lastTransaction.until(date, ChronoUnit.SECONDS);
+        // set to one after testing
+        return seconds <= 10;
     }
 
     @PreAuthorize("authenticated")
@@ -63,13 +61,13 @@ public class TransactionService {
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
-                throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
+                throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
-            if(checkFraud(senderAccount, newTransaction.getDate())){
+            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
                 senderAccount.setStatus(Status.FROZEN);
                 savingsAccountRepository.save(senderAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
@@ -86,12 +84,12 @@ public class TransactionService {
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
-                throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
+                throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
-            if(checkFraud(senderAccount, newTransaction.getDate())){
+            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
                 senderAccount.setStatus(Status.FROZEN);
                 checkingAccountRepository.save(senderAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
@@ -107,13 +105,13 @@ public class TransactionService {
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
-                throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
+                throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
-            if(checkFraud(senderAccount, newTransaction.getDate())){
+            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
                 senderAccount.setStatus(Status.FROZEN);
                 studentAccountRepository.save(senderAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");

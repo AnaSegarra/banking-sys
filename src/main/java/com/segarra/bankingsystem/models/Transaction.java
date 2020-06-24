@@ -3,6 +3,7 @@ package com.segarra.bankingsystem.models;
 import com.segarra.bankingsystem.utils.Money;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class Transaction {
     @JoinColumn(name = "recipient_account_id")
     private Account recipientId;
     private LocalDateTime date;
+    @DecimalMin(value = "0", message = "Transaction amount must be above 0")
     private BigDecimal amount;
 
     public Transaction() {

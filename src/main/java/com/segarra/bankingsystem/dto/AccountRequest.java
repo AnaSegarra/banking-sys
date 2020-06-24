@@ -13,6 +13,7 @@ public class AccountBody {
     private int secretKey;
 
     @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5")
+    @DecimalMin(value = "0", message = "Interest rate shouldn't be a negative value")
     private BigDecimal savingsInterestRate;
     @DecimalMax(value = "1000", message = "Minimum balance must be below 1000")
     @DecimalMin(value = "100", message = "Minimum balance must be above 100")

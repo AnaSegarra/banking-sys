@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -37,34 +38,35 @@ public class TransactionService {
             return false;
         System.out.println("la última transacción " + transaction.get(0));
         int seconds = (int) transaction.get(0).getDate().until(date, ChronoUnit.SECONDS);
+        System.out.println("el tiempo que ha pasado desde la última transacción es de " + seconds);
         // reset to one after testing
         if(seconds <= 10){
             return true;
         }
-        System.out.println("el tiempo que ha pasado desde la última transacción es de " + seconds);
         return false;
     }
 
+    @PreAuthorize("authenticated")
     @Transactional(dontRollbackOn = FrozenAccountException.class)
-    @Secured({"ROLE_ACCOUNTHOLDER"})
     public void makeTransaction(String recipientType, String senderType, TransactionRequest transaction, User user){
         // throw error if accounts ids are the same
         if(transaction.getRecipientId() == transaction.getSenderId())
-            throw new IllegalTransactionException("Recipient account must be different from sender account");
+            throw new IllegalInputException("Recipient account must be different from sender account");
 
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
+        // SENDER
         if(senderType.equals("savings")){
             SavingsAccount senderAccount = savingsAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalTransactionException("Unable to make this transfer: insufficient funds");
+                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
             if(checkFraud(senderAccount, newTransaction.getDate())){
@@ -72,7 +74,7 @@ public class TransactionService {
                 savingsAccountRepository.save(senderAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
-
+            senderAccount.applyAnnualInterest();
             newTransaction.setSenderId(senderAccount);
             senderAccount.getBalance().decreaseAmount(transaction.getAmount());
             senderAccount.applyPenaltyFee(senderAccount.getMinimumBalance());
@@ -80,14 +82,14 @@ public class TransactionService {
         } else if(senderType.equals("checking")){
             CheckingAccount senderAccount = checkingAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalTransactionException("Unable to make this transfer: insufficient funds");
+                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
             if(checkFraud(senderAccount, newTransaction.getDate())){
                 senderAccount.setStatus(Status.FROZEN);
@@ -101,14 +103,14 @@ public class TransactionService {
         } else if(senderType.equals("student")){
             StudentAccount senderAccount = studentAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new FrozenAccountException("Unable to make this transaction: account with " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalTransactionException("Unable to make this transfer: insufficient funds");
+                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
             if(checkFraud(senderAccount, newTransaction.getDate())){
@@ -122,12 +124,13 @@ public class TransactionService {
         } else if(senderType.equals("credit-card")){
             CreditCard senderAccount = creditCardRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) || senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
                 throw new IllegalTransactionException("Unable to access this account");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalTransactionException("Unable to make this transfer: insufficient funds");
+                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
+            senderAccount.applyMonthlyInterest();
             newTransaction.setSenderId(senderAccount);
             senderAccount.getBalance().decreaseAmount(transaction.getAmount());
             creditCardRepository.save(senderAccount);
@@ -135,6 +138,7 @@ public class TransactionService {
             throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }
 
+        // RECIPIENT
         if(recipientType.equals("savings")){
             SavingsAccount recipientAccount = savingsAccountRepository.findById(transaction.getRecipientId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getRecipientId() + " not found"));

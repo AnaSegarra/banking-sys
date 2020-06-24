@@ -26,8 +26,7 @@ public abstract class Account {
         this.penaltyFeeApplied = false;
     }
 
-    public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                   Money balance) {
+    public Account(AccountHolder primaryOwner, AccountHolder secondaryOwner,  Money balance) {
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         this.balance = balance;

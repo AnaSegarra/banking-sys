@@ -31,7 +31,7 @@ public class TransactionService {
         BigDecimal highest = transactionRepository.findHighestDailyTransactionByCustomer(date, account);
         BigDecimal currentTotal = transactionRepository.findTodayTotalTransactions(date, account);
         LocalDateTime lastTransaction =  transactionRepository.findLastTransaction(account);
-        if(currentTotal == null || lastTransaction == null){
+        if(currentTotal == null || lastTransaction == null || highest == null){
             return false;
         }
 
@@ -61,9 +61,13 @@ public class TransactionService {
         if(senderType.equals("savings")){
             SavingsAccount senderAccount = savingsAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                throw new IllegalTransactionException("Unable to access this account");
+            // check ownership
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+                if(senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                    throw new IllegalTransactionException("Unable to access this account");
+                }
             }
+
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
@@ -84,9 +88,14 @@ public class TransactionService {
         } else if(senderType.equals("checking")){
             CheckingAccount senderAccount = checkingAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                throw new IllegalTransactionException("Unable to access this account");
+
+            // check ownership
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+                if(senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                    throw new IllegalTransactionException("Unable to access this account");
+                }
             }
+
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
@@ -101,13 +110,19 @@ public class TransactionService {
             newTransaction.setSenderId(senderAccount);
             senderAccount.getBalance().decreaseAmount(transaction.getAmount());
             senderAccount.applyPenaltyFee(senderAccount.getMinimumBalance());
+            senderAccount.applyMonthlyMaintenanceFee();
             checkingAccountRepository.save(senderAccount);
         } else if(senderType.equals("student")){
             StudentAccount senderAccount = studentAccountRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                throw new IllegalTransactionException("Unable to access this account");
+
+            // check ownership
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+                if(senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                    throw new IllegalTransactionException("Unable to access this account");
+                }
             }
+
             if(senderAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
@@ -126,9 +141,14 @@ public class TransactionService {
         } else if(senderType.equals("credit-card")){
             CreditCard senderAccount = creditCardRepository.findById(transaction.getSenderId())
                     .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername()) && senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                throw new IllegalTransactionException("Unable to access this account");
+
+            // check ownership
+            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+                if(senderAccount.getSecondaryOwner() != null && !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                    throw new IllegalTransactionException("Unable to access this account");
+                }
             }
+            
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }

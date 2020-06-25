@@ -4,10 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "admins")
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class Admin extends User{
     private String name;
 
     public Admin() {
@@ -15,14 +12,6 @@ public class Admin {
 
     public Admin(String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -13,10 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "account_holders")
-public class AccountHolder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class AccountHolder extends User{
     @NotBlank(message = "Name is required")
     private String name;
     @NotNull(message = "Birthday is required")
@@ -42,38 +39,23 @@ public class AccountHolder {
     @JsonIgnore
     private List<Account> secondaryAccounts;
 
-    // password & username to use as credentials
-    @NotNull(message = "A password is required")
-    private String password;
-    @NotNull(message = "A username is required")
-    private String username;
-
     public AccountHolder() {
     }
 
     public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username) {
+        super(username, password);
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
-        this.password = password;
-        this.username = username;
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username, Address mailingAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password,
+                         String username, Address mailingAddress) {
+        super(username, password);
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
-        this.password = password;
-        this.username = username;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public List<Account> getAccounts() {
@@ -124,20 +106,13 @@ public class AccountHolder {
         this.mailingAddress = mailingAddress;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    @Override
+    public String toString() {
+        return "AccountHolder {" +
+                "name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", username=" + getUsername() +
+                '}';
     }
 }
 

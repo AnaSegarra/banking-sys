@@ -1,16 +1,19 @@
 package com.segarra.bankingsystem.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table
-public class User {
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private int id;
+    @NotNull(message = "A username is required")
     private String username;
+    @NotNull(message = "A password is required")
     private String password;
 
     @OneToMany(fetch= FetchType.EAGER, cascade= CascadeType.ALL, mappedBy="user")
@@ -24,10 +27,10 @@ public class User {
         this.password = password;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
     public String getUsername() {

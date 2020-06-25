@@ -1,6 +1,6 @@
 package com.segarra.bankingsystem.services;
 
-import com.segarra.bankingsystem.dto.AccountBody;
+import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.exceptions.ResourceNotFoundException;
 import com.segarra.bankingsystem.models.*;
@@ -24,7 +24,7 @@ public class AccountService {
     @Autowired
     private SavingsAccountRepository savingsAccountRepository;
 
-    public Account create(String accountType, AccountBody newAccount) {
+    public Account create(String accountType, AccountRequest newAccount) {
         AccountHolder primaryOwner = accountHolderRepository.findById(newAccount.getPrimaryOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getPrimaryOwnerId() + " not found"));
         AccountHolder secondaryOwner = null;

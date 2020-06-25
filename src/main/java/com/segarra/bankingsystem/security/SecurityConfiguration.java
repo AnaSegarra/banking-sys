@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled=true)
+@EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -36,9 +36,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         httpSecurity.httpBasic();
         httpSecurity.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/users/transaction").hasAuthority("ROLE_ACCOUNTHOLDER")
-                .anyRequest().permitAll()
-                .and().logout().deleteCookies("JSESSIONID");
+                .antMatchers(HttpMethod.POST, "/api/v1/transactions").authenticated()
+                .antMatchers("/api/v1/users/accounts").authenticated()
+                .anyRequest().permitAll();
 
         // disabled CSRF allows POST and DELETE requests
         httpSecurity.csrf().disable();

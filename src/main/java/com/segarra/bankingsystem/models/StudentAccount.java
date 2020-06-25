@@ -16,7 +16,6 @@ public class StudentAccount extends Account {
     protected Status status;
 
     public StudentAccount() {
-        this.status = Status.ACTIVE;
     }
 
     public StudentAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, int secretKey) {
@@ -45,17 +44,5 @@ public class StudentAccount extends Account {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "StudentAccount{" +
-                "primaryOwner=" + primaryOwner +
-                ", secondaryOwner=" + secondaryOwner +
-                ", balance=" + balance +
-                ", penaltyFee=" + penaltyFee +
-                ", secretKey=" + secretKey +
-                ", status=" + status +
-                '}';
     }
 }

@@ -1,11 +1,8 @@
 package com.segarra.bankingsystem.models;
 
-import com.segarra.bankingsystem.utils.Money;
-
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,12 +14,11 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "sender_account_id")
     private Account senderId;
-
     @ManyToOne
     @JoinColumn(name = "recipient_account_id")
     private Account recipientId;
     private LocalDateTime date;
-    @DecimalMin(value = "0", message = "Transaction amount must be above 0")
+    @DecimalMin(value = "0", message = "Transaction amount must be above 0", inclusive = false)
     private BigDecimal amount;
 
     public Transaction() {
@@ -76,14 +72,4 @@ public class Transaction {
         this.amount = amount;
     }
 
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", senderId=" + senderId +
-                ", recipientId=" + recipientId +
-                ", date=" + date +
-                ", amount=" + amount +
-                '}';
-    }
 }

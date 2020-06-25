@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class StudentAccountService {
     @Autowired
-    StudentAccountRepository studentAccountRepository;
+    private StudentAccountRepository studentAccountRepository;
 
     public List<StudentAccount> getAll(){
         return studentAccountRepository.findAll();

@@ -15,7 +15,7 @@ public class GlobalHandler {
 
     @ExceptionHandler(IllegalTransactionException.class)
     public void handleIllegalTransactionException(IllegalTransactionException e, HttpServletResponse response) throws IOException {
-        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler(FrozenAccountException.class)

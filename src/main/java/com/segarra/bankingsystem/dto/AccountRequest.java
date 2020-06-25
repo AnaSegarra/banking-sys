@@ -6,7 +6,7 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
-public class AccountBody {
+public class AccountRequest {
     private int primaryOwnerId;
     private int secondaryOwnerId;
     private Money balance;
@@ -26,12 +26,12 @@ public class AccountBody {
     @DecimalMax(value = "0.2", message = "Interest rate must be below 0.2")
     private BigDecimal cardInterestRate;
 
-    public AccountBody() {
+    public AccountRequest() {
     }
 
-    public AccountBody(int primaryOwnerId, int secondaryOwnerId, Money balance, int secretKey,
-                       BigDecimal savingsInterestRate, BigDecimal savingsMinimumBalance,
-                       BigDecimal creditCardLimit, BigDecimal cardInterestRate) {
+    public AccountRequest(int primaryOwnerId, int secondaryOwnerId, Money balance, int secretKey,
+                          BigDecimal savingsInterestRate, BigDecimal savingsMinimumBalance,
+                          BigDecimal creditCardLimit, BigDecimal cardInterestRate) {
         this.primaryOwnerId = primaryOwnerId;
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = balance;

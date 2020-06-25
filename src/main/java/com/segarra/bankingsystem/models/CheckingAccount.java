@@ -2,13 +2,14 @@ package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.utils.Money;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -22,6 +23,8 @@ public class CheckingAccount extends Account {
     @Enumerated(value = EnumType.STRING)
     private Status status;
     private LocalDateTime lastFeeApplied;
+
+    private static final Logger LOGGER = LogManager.getLogger(CheckingAccount.class);
 
     public CheckingAccount() {
     }
@@ -76,14 +79,24 @@ public class CheckingAccount extends Account {
 
     public void applyMonthlyMaintenanceFee(){
         int months = Period.between(LocalDate.from(lastFeeApplied), LocalDate.now()).getMonths();
-        System.out.println("Los meses que han pasado " + months);
         if(months > 0){
+            LOGGER.info("Apply " + months + " time(s) the monthly maintenance fee to checking account " + this.getId());
+            LOGGER.info("Previous balance: " + balance);
             for(int i = 0; i < months; i++){
-                System.out.println("el balance antes de aplicar el fee " + balance);
                 balance.decreaseAmount(monthlyMaintenanceFee);
-                System.out.println("el balance después de aplicar el fee " + balance);
             }
+            LOGGER.info("Balance after deducting the fee: " + balance);
             lastFeeApplied = lastFeeApplied.plusMonths(months);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "CheckingAccount{" +
+                "id=" + id +
+                ", primaryOwner=" + primaryOwner +
+                ", secondaryOwner=" + secondaryOwner +
+                ", balance=" + balance +
+                '}';
     }
 }

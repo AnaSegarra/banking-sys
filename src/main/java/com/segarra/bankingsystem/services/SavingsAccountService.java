@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class SavingsAccountService {
     @Autowired
-    SavingsAccountRepository savingsAccountRepository;
+    private SavingsAccountRepository savingsAccountRepository;
 
     public List<SavingsAccount> getAll(){
         return savingsAccountRepository.findAll();

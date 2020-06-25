@@ -1,13 +1,13 @@
 package com.segarra.bankingsystem.dto;
 
-import com.segarra.bankingsystem.utils.Money;
-
+import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
 public class TransactionRequest {
     private String recipientName;
     private int recipientId;
     private int senderId;
+    @DecimalMin(value = "0", message = "Transaction amount must be above 0", inclusive = false)
     private BigDecimal amount;
 
     public TransactionRequest() {

@@ -2,12 +2,13 @@ package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.utils.Money;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -26,6 +27,8 @@ public class SavingsAccount extends Account {
     @DecimalMin(value = "100", message = "Minimum balance must be above 100")
     private BigDecimal minimumBalance;
     private LocalDateTime lastInterestApplied;
+
+    private static final Logger LOGGER = LogManager.getLogger(SavingsAccount.class);
 
     public SavingsAccount() {
     }
@@ -92,12 +95,12 @@ public class SavingsAccount extends Account {
 
     public void applyAnnualInterest(){
         int years = Period.between(LocalDate.from(lastInterestApplied), LocalDate.now()).getYears();
-        System.out.println("Los años que han pasado " + years);
         if(years > 0){
+            LOGGER.info("Apply " + years + " time(s) the annual interestRate to savings account " + this.getId());
             for(int i = 0; i < years; i++){
-                BigDecimal addValue = balance.getAmount().multiply(interestRate);
-                System.out.println("El interés añadido - " + addValue);
-                balance.increaseAmount(addValue);
+                BigDecimal interest = balance.getAmount().multiply(interestRate);
+                LOGGER.info("Balance increased by " + interest);
+                balance.increaseAmount(interest);
             }
             lastInterestApplied = lastInterestApplied.plusYears(years);
         }

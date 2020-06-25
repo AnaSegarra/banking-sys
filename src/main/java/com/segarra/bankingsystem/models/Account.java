@@ -1,6 +1,8 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.utils.Money;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,6 +23,8 @@ public abstract class Account {
     protected Money balance;
     protected boolean penaltyFeeApplied;
     protected final BigDecimal penaltyFee = new BigDecimal("40");
+
+    private static final Logger LOGGER = LogManager.getLogger(Account.class);
 
     public Account() {
         this.penaltyFeeApplied = false;
@@ -86,6 +90,7 @@ public abstract class Account {
     public void applyPenaltyFee(BigDecimal minimumBalance){
         // balance below minimumBalance results in a deduction of the penalty fee
         if(balance.getAmount().compareTo(minimumBalance) < 0 && !penaltyFeeApplied){
+            LOGGER.info("Apply penalte fee to " + getId());
             balance.decreaseAmount(penaltyFee);
             setPenaltyFeeApplied(true);
         }

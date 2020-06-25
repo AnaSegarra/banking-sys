@@ -1,6 +1,8 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.utils.Money;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
@@ -22,9 +24,9 @@ public class CreditCard extends Account {
     private BigDecimal interestRate;
     private LocalDateTime lastInterestApplied;
 
+    private static final Logger LOGGER = LogManager.getLogger(CreditCard.class);
+
     public CreditCard() {
-//        setCreditLimit(creditLimit);
-//        setInterestRate(interestRate);
     }
 
     public CreditCard(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, BigDecimal creditLimit,
@@ -68,12 +70,13 @@ public class CreditCard extends Account {
 
     public void applyMonthlyInterest(){
         int months = Period.between(LocalDate.from(lastInterestApplied), LocalDate.now()).getMonths();
-        System.out.println("Los meses que han pasado " + months);
         if(months > 0){
+            LOGGER.info("Apply " + months + " time(s) the monthly interestRate to credit card " + this.getId());
             for(int i = 0; i < months; i++){
-                BigDecimal addValue = balance.getAmount()
+                BigDecimal interest = balance.getAmount()
                         .multiply(interestRate.divide(new BigDecimal("12"),2, RoundingMode.HALF_EVEN));
-                balance.increaseAmount(addValue);
+                LOGGER.info("Balance increased by " + interest);
+                balance.increaseAmount(interest);
             }
             lastInterestApplied = lastInterestApplied.plusMonths(months);
         }

@@ -2,6 +2,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.AccountController;
 import com.segarra.bankingsystem.dto.AccountRequest;
+import com.segarra.bankingsystem.dto.AccountVM;
 import com.segarra.bankingsystem.models.Account;
 import com.segarra.bankingsystem.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,12 @@ import javax.validation.Valid;
 public class AccountControllerImpl implements AccountController {
     @Autowired
     private AccountService accountService;
+
+    @GetMapping("/accounts/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AccountVM getById(@PathVariable int id) {
+        return accountService.getById(id);
+    }
 
     @PostMapping("/accounts")
     @ResponseStatus(HttpStatus.CREATED)

@@ -1,14 +1,15 @@
 package com.segarra.bankingsystem.services;
 
+import com.segarra.bankingsystem.dto.AccountHolderVM;
 import com.segarra.bankingsystem.dto.AccountVM;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
-import com.segarra.bankingsystem.exceptions.IllegalTransactionException;
 import com.segarra.bankingsystem.exceptions.ResourceNotFoundException;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class AccountHolderService {
@@ -40,8 +40,12 @@ public class AccountHolderService {
 
     private static final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
 
-    public List<AccountHolder> getAll(){
-        return accountHolderRepository.findAll();
+    @Secured({"ROLE_ADMIN"})
+    public List<AccountHolderVM> getAll(){
+        return accountHolderRepository.findAll().stream()
+                .map(accountHolder -> new AccountHolderVM(accountHolder.getId(), accountHolder.getName(),
+                        accountHolder.getUsername(), accountHolder.getBirthday(), accountHolder.getPrimaryAddress(),
+                        accountHolder.getMailingAddress())).collect(Collectors.toList());
     }
 
     public AccountHolder create(AccountHolder accountHolder){
@@ -64,7 +68,8 @@ public class AccountHolderService {
         List<Account> accounts = accountRepository.findAllUserAccounts(user.getId());
         return accounts.stream().map(account -> new AccountVM(account.getId(), account.getBalance(),
                 account.getClass().getSimpleName(), account.getPrimaryOwner().getName(),
-                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned")).collect(Collectors.toList());
+                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned"))
+                .collect(Collectors.toList());
     }
 
     @PreAuthorize("authenticated")

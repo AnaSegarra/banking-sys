@@ -1,6 +1,7 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.AccountHolderController;
+import com.segarra.bankingsystem.dto.AccountHolderVM;
 import com.segarra.bankingsystem.dto.AccountVM;
 import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.User;
@@ -21,7 +22,7 @@ public class AccountHolderControllerImpl implements AccountHolderController {
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public List<AccountHolder> getAll() {
+    public List<AccountHolderVM> getAll() {
         return accountHolderService.getAll();
     }
 

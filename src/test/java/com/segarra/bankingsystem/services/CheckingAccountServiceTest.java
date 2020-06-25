@@ -5,6 +5,7 @@ import com.segarra.bankingsystem.models.CheckingAccount;
 import com.segarra.bankingsystem.models.StudentAccount;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
 import com.segarra.bankingsystem.repositories.CheckingAccountRepository;
+import com.segarra.bankingsystem.repositories.CreditCardRepository;
 import com.segarra.bankingsystem.repositories.StudentAccountRepository;
 import com.segarra.bankingsystem.utils.Address;
 import com.segarra.bankingsystem.utils.Money;
@@ -38,18 +39,13 @@ class CheckingAccountServiceTest {
     private StudentAccountRepository studentAccountRepository;
 
     private List<CheckingAccount> checkingAccountList;
-    private AccountHolder accountHolder;
-    private AccountHolder youngAccHolder;
-
 
     @BeforeEach
     void setUp() {
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
-        accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
+        AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
-        youngAccHolder = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-                new Address("Spain", "Madrid", "Luna Avenue", 8, "28200"), "1234", "gabi_c");
 
         CheckingAccount checkingAccount = new CheckingAccount(accountHolder2,
                 new Money(new BigDecimal("2000")), 1234);

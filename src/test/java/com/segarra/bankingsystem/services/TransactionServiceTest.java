@@ -14,4 +14,9 @@ class TransactionServiceTest {
     @Test
     void makeTransaction() {
     }
+
+    @Test
+    void checkFraud() {
+    }
+
 }

@@ -1,7 +1,9 @@
 package com.segarra.bankingsystem.services;
 
 import com.segarra.bankingsystem.models.AccountHolder;
+import com.segarra.bankingsystem.models.Role;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
+import com.segarra.bankingsystem.repositories.RoleRepository;
 import com.segarra.bankingsystem.utils.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +27,8 @@ class AccountHolderServiceTest {
 
     @MockBean
     private AccountHolderRepository accountHolderRepository;
+    @MockBean
+    private RoleRepository roleRepository;
 
     private List<AccountHolder> accountHolderList;
 
@@ -52,7 +56,9 @@ class AccountHolderServiceTest {
     void create() {
         AccountHolder accountHolder = new AccountHolder("Sergio", LocalDate.of(2020, 1, 28),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28700"), "1234", "gabi_c");
+        Role role = new Role("ROLE_ACCOUNTHOLDER", accountHolder);
         when(accountHolderRepository.save(any(AccountHolder.class))).thenReturn(accountHolder);
+        when(roleRepository.save(any(Role.class))).thenReturn(role);
 
         AccountHolder savedAccHolder = accountHolderService.create(accountHolder);
         assertEquals("Sergio", savedAccHolder.getName());

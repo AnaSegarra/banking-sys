@@ -6,11 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface StudentAccountRepository extends JpaRepository<StudentAccount, Integer> {
-    @Query("SELECT c FROM StudentAccount c WHERE primary_owner = :primaryOwnerId OR secondary_owner = :secondaryOwnerId ")
-    List<StudentAccount> findByOwner(@Param("primaryOwnerId") int primaryOwnerId,
-                                      @Param("secondaryOwnerId") int secondaryOwnerId);
+    @Query("SELECT s FROM StudentAccount s WHERE (primary_owner = :id OR secondary_owner = :id) AND id = :accountId")
+    StudentAccount findAccountById(@Param("id") Integer userId, @Param("accountId") Integer accountId);
 }

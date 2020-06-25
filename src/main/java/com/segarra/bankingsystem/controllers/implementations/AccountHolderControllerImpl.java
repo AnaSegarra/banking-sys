@@ -31,6 +31,12 @@ public class AccountHolderControllerImpl implements AccountHolderController {
         return accountHolderService.getAllAccounts(user);
     }
 
+    @GetMapping("/users/accounts/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AccountVM getAccountById(@PathVariable int id, @AuthenticationPrincipal User user){
+        return accountHolderService.getAccountById(id, user);
+    }
+
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public AccountHolder create(@Valid @RequestBody AccountHolder accountHolder) {

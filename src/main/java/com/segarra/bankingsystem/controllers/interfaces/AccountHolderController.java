@@ -11,4 +11,5 @@ public interface AccountHolderController {
     List<AccountHolder> getAll();
     AccountHolder create(AccountHolder accountHolder);
     List<AccountVM> getAllAccounts(User user);
+    AccountVM getAccountById(int id, User user);
 }

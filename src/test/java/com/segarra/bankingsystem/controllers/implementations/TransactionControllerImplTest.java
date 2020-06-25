@@ -2,6 +2,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
+import com.segarra.bankingsystem.services.UserDetailsServiceImpl;
 import com.segarra.bankingsystem.utils.Address;
 import com.segarra.bankingsystem.utils.Money;
 import org.junit.jupiter.api.AfterEach;
@@ -10,12 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,33 +33,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class TransactionControllerImplTest {
     @Autowired
-    SavingsAccountRepository savingsAccountRepository;
+    private SavingsAccountRepository savingsAccountRepository;
     @Autowired
-    CheckingAccountRepository checkingAccountRepository;
+    private CheckingAccountRepository checkingAccountRepository;
     @Autowired
-    CreditCardRepository creditCardRepository;
+    private CreditCardRepository creditCardRepository;
     @Autowired
-    StudentAccountRepository studentAccountRepository;
+    private StudentAccountRepository studentAccountRepository;
     @Autowired
-    AccountHolderRepository accountHolderRepository;
+    private AccountHolderRepository accountHolderRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private WebApplicationContext wac;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private MockMvc mockMvc;
     private CheckingAccount checkingAccount;
     private CheckingAccount checkingAccount2;
+
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
 
-        AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
         AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
+        AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
+                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
         AccountHolder youngAccHolder = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
                 new Address("Spain", "Madrid", "Luna Avenue", 8, "28200"), "1234", "gabi_c");
+
+        accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
+
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2, youngAccHolder).collect(Collectors.toList()));
+
+
+        Role role = new Role("ROLE_ACCOUNTHOLDER", accountHolder);
+        roleRepository.save(role);
 
         SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,
                 new Money(new BigDecimal("2000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
@@ -83,16 +99,19 @@ class TransactionControllerImplTest {
         savingsAccountRepository.deleteAll();
         creditCardRepository.deleteAll();
         accountHolderRepository.deleteAll();
+        roleRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     void makeTransaction() throws Exception {
         mockMvc.perform(post("/api/v1/transactions").param("recipient","checking")
                 .param("sender", "checking")
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount.getId() + ", \"senderId\":" + checkingAccount2.getId() + ",\"amount\": 200}")
+                .with(httpBasic("ana_s", "1234"))
+                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 200}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        assertEquals( new BigDecimal("1800") ,checkingAccount.getBalance().getAmount());
+        assertEquals( new BigDecimal("1800.00"), checkingAccountRepository.findById(checkingAccount.getId()).get().getBalance().getAmount());
     }
 }

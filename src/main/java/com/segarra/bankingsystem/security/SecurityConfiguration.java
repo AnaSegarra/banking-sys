@@ -38,6 +38,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/transactions").authenticated()
                 .antMatchers("/api/v1/users/accounts/**").authenticated()
+                .antMatchers("/api/v1/users").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/api/v1/accounts/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().permitAll();
 
         // disabled CSRF allows POST and DELETE requests

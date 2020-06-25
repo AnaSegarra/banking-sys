@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.AccountController;
-import com.segarra.bankingsystem.dto.AccountBody;
+import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.models.Account;
 import com.segarra.bankingsystem.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class AccountControllerImpl implements AccountController {
     @PostMapping("/accounts")
     @ResponseStatus(HttpStatus.CREATED)
     public Account create(@RequestParam(name = "type") String accountType,
-                          @Valid @RequestBody AccountBody newAccount) {
+                          @Valid @RequestBody AccountRequest newAccount) {
         return accountService.create(accountType, newAccount);
     }
 }

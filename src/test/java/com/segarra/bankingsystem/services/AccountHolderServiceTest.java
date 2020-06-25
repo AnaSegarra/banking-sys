@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ class AccountHolderServiceTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Unit test - retrieval of all account holders")
     void getAll() {
         when(accountHolderRepository.findAll()).thenReturn(accountHolderList);
@@ -52,6 +54,7 @@ class AccountHolderServiceTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Unit test - signup of new account holder")
     void create() {
         AccountHolder accountHolder = new AccountHolder("Sergio", LocalDate.of(2020, 1, 28),

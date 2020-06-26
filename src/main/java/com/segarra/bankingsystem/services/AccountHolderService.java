@@ -40,8 +40,9 @@ public class AccountHolderService {
 
     private static final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
 
+    // retrieve every account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
-    public List<AccountHolderVM> getAll(){
+    public List<AccountHolderVM> getAllAccountHolders(){
         return accountHolderRepository.findAll().stream()
                 .map(accountHolder -> new AccountHolderVM(accountHolder.getId(), accountHolder.getName(),
                         accountHolder.getUsername(), accountHolder.getBirthday(), accountHolder.getPrimaryAddress(),

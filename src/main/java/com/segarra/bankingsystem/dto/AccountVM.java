@@ -8,14 +8,9 @@ public class AccountVM {
     private String accountType;
     private String primaryOwner;
     private String secondaryOwner;
+    private String status;
 
     public AccountVM() {
-    }
-
-    public AccountVM(int id, Money balance, String className) {
-        this.id = id;
-        this.balance = balance;
-        setAccountType(className);
     }
 
     public AccountVM(int id, Money balance, String className, String primaryOwner, String secondaryOwner) {
@@ -24,6 +19,15 @@ public class AccountVM {
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
         setAccountType(className);
+    }
+
+    public AccountVM(int id, Money balance, String accountType, String primaryOwner, String secondaryOwner, String status) {
+        this.id = id;
+        this.balance = balance;
+        this.accountType = accountType;
+        this.primaryOwner = primaryOwner;
+        this.secondaryOwner = secondaryOwner;
+        this.status = status;
     }
 
     public int getId() {
@@ -64,5 +68,13 @@ public class AccountVM {
 
     public void setSecondaryOwner(String secondaryOwner) {
         this.secondaryOwner = secondaryOwner;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

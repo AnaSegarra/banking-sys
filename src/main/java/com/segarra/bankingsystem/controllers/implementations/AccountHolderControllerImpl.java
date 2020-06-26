@@ -23,7 +23,7 @@ public class AccountHolderControllerImpl implements AccountHolderController {
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
     public List<AccountHolderVM> getAll() {
-        return accountHolderService.getAll();
+        return accountHolderService.getAllAccountHolders();
     }
 
     @GetMapping("/users/accounts")
@@ -43,5 +43,4 @@ public class AccountHolderControllerImpl implements AccountHolderController {
     public AccountHolder create(@Valid @RequestBody AccountHolder accountHolder) {
         return accountHolderService.create(accountHolder);
     }
-
 }

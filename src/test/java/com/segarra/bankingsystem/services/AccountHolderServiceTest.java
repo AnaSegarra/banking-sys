@@ -50,7 +50,7 @@ class AccountHolderServiceTest {
     @DisplayName("Unit test - retrieval of all account holders")
     void getAll() {
         when(accountHolderRepository.findAll()).thenReturn(accountHolderList);
-        assertEquals(2, accountHolderService.getAll().size());
+        assertEquals(2, accountHolderService.getAllAccountHolders().size());
     }
 
     @Test

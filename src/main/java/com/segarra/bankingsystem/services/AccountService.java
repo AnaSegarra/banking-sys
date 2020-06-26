@@ -30,18 +30,18 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    // retrieval of any account by id - admin restricted
+    // retrieve of any account by id - admin restricted
     @Secured({"ROLE_ADMIN"})
     public AccountVM getById(int id){
         Account account = accountRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Account with id " + id + " not found"));
         if (account instanceof CheckingAccount) {
             return new AccountVM(account.getId(), account.getBalance(), "Checking account", account.getPrimaryOwner().getName(),
-                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName()  : "No secondary owner assigned");
+                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName()  : "No secondary owner assigned",  ((CheckingAccount) account).getStatus().toString());
         }
         if (account instanceof SavingsAccount) {
             return new AccountVM(account.getId(), account.getBalance(),
                     "Savings account", account.getPrimaryOwner().getName(),
-                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned");
+                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((SavingsAccount) account).getStatus().toString());
 
         }
         if (account instanceof CreditCard) {
@@ -52,7 +52,7 @@ public class AccountService {
 
         // student account
         return new AccountVM(account.getId(), account.getBalance(), "Student account", account.getPrimaryOwner().getName(),
-                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned");
+                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((StudentAccount) account).getStatus().toString());
 
     }
 

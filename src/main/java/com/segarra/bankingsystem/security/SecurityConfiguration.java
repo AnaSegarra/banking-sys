@@ -38,9 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity.authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/transactions").hasAuthority("ROLE_ACCOUNTHOLDER")
                 .antMatchers("/api/v1/users/accounts/**").hasAuthority("ROLE_ACCOUNTHOLDER")
-                .antMatchers("/api/v1/users").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/api/v1/accounts/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/api/v1/third-parties").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/api/v1/(accounts/**|third-parties|users|checking-accounts|savings-accounts|credit-cards|student-accounts)").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/v1/third-parties/accounts/**").hasAuthority("ROLE_THIRDPARTY")
                 .anyRequest().permitAll();
 

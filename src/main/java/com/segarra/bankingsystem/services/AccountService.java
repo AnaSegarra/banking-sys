@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -202,6 +201,38 @@ public class AccountService {
             account.getBalance().increaseAmount(amount);
         } else {
             throw new IllegalInputException("Must enter a valid operation of either debit or credit");
+        }
+    }
+
+    // debit or credit accounts - admin restricted
+    @Secured({"ROLE_ADMIN"})
+    public void financeAccount(int accountId, FinanceAdminRequest financeAdminRequest){
+        Account account = accountRepository.findById(accountId).orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+
+        if (account instanceof CheckingAccount) {
+            CheckingAccount checkingAccount = (CheckingAccount) account;
+            checkingAccount.applyMonthlyMaintenanceFee();
+            applyFinance(checkingAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
+            checkingAccount.applyPenaltyFee(checkingAccount.getMinimumBalance());
+            checkingAccountRepository.save(checkingAccount);
+
+        } else if (account instanceof SavingsAccount) {
+            SavingsAccount savingsAccount = (SavingsAccount) account;
+            savingsAccount.applyAnnualInterest();
+            applyFinance(savingsAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
+            savingsAccount.applyPenaltyFee(savingsAccount.getMinimumBalance());
+            savingsAccountRepository.save(savingsAccount);
+
+        } else if (account instanceof CreditCard) {
+            CreditCard creditCard = (CreditCard) account;
+            creditCard.applyMonthlyInterest();
+            applyFinance(creditCard, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
+            creditCardRepository.save(creditCard);
+
+        } else if (account instanceof StudentAccount) {
+            StudentAccount studentAccount = (StudentAccount) account;
+            applyFinance(studentAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
+            studentAccountRepository.save(studentAccount);
         }
     }
 

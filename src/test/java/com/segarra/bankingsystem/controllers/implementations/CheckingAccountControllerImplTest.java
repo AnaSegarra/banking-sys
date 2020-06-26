@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,7 +44,7 @@ class CheckingAccountControllerImplTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
 
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
@@ -70,6 +72,7 @@ class CheckingAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all checking accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/api/v1/checking-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/checking-accounts")
+                .with(user("admin").roles("ADMIN"))).andExpect(status().isOk());
     }
 }

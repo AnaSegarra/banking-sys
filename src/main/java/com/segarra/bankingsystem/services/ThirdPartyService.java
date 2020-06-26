@@ -31,8 +31,8 @@ public class ThirdPartyService {
     public ThirdPartyUser create(ThirdPartyUser thirdPartyUser){
         User foundUser = userRepository.findByUsername(thirdPartyUser.getUsername());
         if(foundUser != null){
-            LOGGER.info("Username taken - throw exception; status code 400");
-            throw new IllegalInputException("This username has already been taken");
+            LOGGER.error("Controlled exception - Username " + thirdPartyUser.getUsername() + " is already taken");
+            throw new IllegalInputException("Username" + thirdPartyUser.getUsername() + "is already taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         thirdPartyUser.setPassword(passwordEncoder.encode(thirdPartyUser.getPassword()));

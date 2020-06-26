@@ -3,6 +3,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 import com.segarra.bankingsystem.controllers.interfaces.AccountController;
 import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.AccountVM;
+import com.segarra.bankingsystem.dto.FinanceAdminRequest;
 import com.segarra.bankingsystem.dto.FinanceThirdPartyRequest;
 import com.segarra.bankingsystem.models.Account;
 import com.segarra.bankingsystem.models.User;
@@ -37,6 +38,12 @@ public class AccountControllerImpl implements AccountController {
     @ResponseStatus(HttpStatus.CREATED)
     public Account create(@RequestBody @Valid AccountRequest newAccount) {
         return accountService.create(newAccount);
+    }
+
+    @PostMapping("/accounts/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void financeAccount(@PathVariable("id") int id, @RequestBody FinanceAdminRequest financeAdminRequest) {
+        accountService.financeAccount(id, financeAdminRequest);
     }
 
     @GetMapping("/users/accounts")

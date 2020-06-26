@@ -111,7 +111,7 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test successful transaction between checking accounts, expected reduced balance and 204 status code")
     void makeTransaction_CheckingAccounts() throws Exception {
-        mockMvc.perform(post("/api/v1/transactions").param("recipient","checking")
+        mockMvc.perform(post("/api/v1/transactions")
                 .param("sender", "checking")
                 .with(httpBasic("ana_s", "1234"))
                 .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 200}")
@@ -296,28 +296,6 @@ class TransactionControllerImplTest {
                 .param("sender", "credit-card")
                 .with(httpBasic("ana_s", "1234"))
                 .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + creditCard.getId() + ", \"amount\": 4100}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Test transaction with an invalid sender account type, expected 400 status code")
-    void makeTransaction_InvalidSenderAccountType_BadRequest() throws Exception {
-        mockMvc.perform(post("/api/v1/transactions").param("recipient","checking")
-                .param("sender", "credit-account")
-                .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + creditCard.getId() + ", \"amount\": 100}")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("Test transaction with an invalid recipient account type, expected 400 status code")
-    void makeTransaction_InvalidRecipientAccountType_BadRequest() throws Exception {
-        mockMvc.perform(post("/api/v1/transactions").param("recipient","checkings-acount")
-                .param("sender", "credit-card")
-                .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + creditCard.getId() + ", \"amount\": 100}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

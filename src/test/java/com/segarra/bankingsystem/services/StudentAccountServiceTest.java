@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ class StudentAccountServiceTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Unit test - retrieval of all student accounts")
     void getAll() {
         when(studentAccountRepository.findAll()).thenReturn(studentAccountList);

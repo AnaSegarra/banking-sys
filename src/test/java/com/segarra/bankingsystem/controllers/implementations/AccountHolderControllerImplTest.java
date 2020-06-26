@@ -56,7 +56,8 @@ class AccountHolderControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all account holders")
     void getAll() throws Exception {
-        mockMvc.perform(get("/api/v1/users").with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/api/v1/users")
+                .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
     }
 

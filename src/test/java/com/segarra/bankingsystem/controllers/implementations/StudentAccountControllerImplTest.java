@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,7 +39,7 @@ class StudentAccountControllerImplTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
         AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
         AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
@@ -61,6 +63,7 @@ class StudentAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all student accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/api/v1/student-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/student-accounts")
+                .with(user("admin").roles("ADMIN"))).andExpect(status().isOk());
     }
 }

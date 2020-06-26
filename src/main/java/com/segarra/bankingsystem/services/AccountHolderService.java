@@ -29,6 +29,7 @@ public class AccountHolderService {
     // retrieve every account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
     public List<AccountHolderVM> getAllAccountHolders(){
+        LOGGER.info("Admin GET request to retrieve every account holder");
         return accountHolderRepository.findAll().stream()
                 .map(accountHolder -> new AccountHolderVM(accountHolder.getId(), accountHolder.getName(),
                         accountHolder.getUsername(), accountHolder.getBirthday(), accountHolder.getPrimaryAddress(),
@@ -41,7 +42,7 @@ public class AccountHolderService {
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());
         if(foundUser != null){
             LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
-            throw new IllegalInputException("This username has already been taken");
+            throw new IllegalInputException("Username" + accountHolder.getUsername() + "is already taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));

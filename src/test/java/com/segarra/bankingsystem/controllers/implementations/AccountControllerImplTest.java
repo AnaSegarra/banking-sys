@@ -2,6 +2,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segarra.bankingsystem.dto.AccountRequest;
+import com.segarra.bankingsystem.dto.FinanceAdminRequest;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
 import com.segarra.bankingsystem.models.Address;
@@ -54,6 +55,8 @@ class AccountControllerImplTest {
     private CreditCard creditCard;
     private ObjectMapper objectMapper = new ObjectMapper();
     private AccountRequest accountRequest;
+    private FinanceAdminRequest debitRequest;
+    private FinanceAdminRequest creditRequest;
 
     @BeforeEach
     void setUp() {
@@ -86,6 +89,11 @@ class AccountControllerImplTest {
         accountRequest.setSecretKey(1234);
         accountRequest.setBalance(new Money(new BigDecimal("12000")));
         accountRequest.setAccountType("checking");
+
+
+        // ==== request objects
+        debitRequest = new FinanceAdminRequest(new BigDecimal("100"), "debit");
+        creditRequest = new FinanceAdminRequest(new BigDecimal("200"), "credit");
     }
 
     @AfterEach
@@ -279,5 +287,73 @@ class AccountControllerImplTest {
                 .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test debit checking account, expected reduced balance")
+    void financeAccount_DebitCheckingAccount() throws Exception {
+        mockMvc.perform(post("/api/v1/accounts/" + checkingAccount.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(debitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("1900.00"), checkingAccountRepository.findById(checkingAccount.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test credit savings account, expected increased balance")
+    void financeAccount_CreditSavingsAccount() throws Exception {
+        mockMvc.perform(post("/api/v1/accounts/" + savingsAccount.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(creditRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("1200.00"), savingsAccountRepository.findById(savingsAccount.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test debit credit card, expected reduced balance")
+    void financeAccount_DebitCreditCard() throws Exception {
+        mockMvc.perform(post("/api/v1/accounts/" + creditCard.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(debitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("3900.00"), creditCardRepository.findById(creditCard.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test debit student account, expected reduced balance")
+    void financeAccount_DebitStudentAccount() throws Exception {
+        mockMvc.perform(post("/api/v1/accounts/" + studentAccount.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(debitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("2900.00"), studentAccountRepository.findById(studentAccount.getId()).get().getBalance().getAmount());
+    }
+
+
+    // TEST INVALID REQUESTS
+    @Test
+    @DisplayName("Test debit/credit an account that doesn't exist, expected expected 400 status code")
+    void financeAccount_InvalidAccountId() throws Exception {
+        mockMvc.perform(post("/api/v1/accounts/20")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(debitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @DisplayName("Test finance account with invalid operation type, expected expected 400 status code")
+    void financeAccount_InvalidOperationType() throws Exception {
+        FinanceAdminRequest invalidRequest = new FinanceAdminRequest(new BigDecimal("200"), "finance");
+
+        mockMvc.perform(post("/api/v1/accounts/" + checkingAccount.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(invalidRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
     }
 }

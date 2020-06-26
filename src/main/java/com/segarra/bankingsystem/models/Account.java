@@ -89,7 +89,7 @@ public abstract class Account {
     public void applyPenaltyFee(BigDecimal minimumBalance){
         // balance below minimumBalance results in a deduction of the penalty fee
         if(balance.getAmount().compareTo(minimumBalance) < 0 && !penaltyFeeApplied){
-            LOGGER.info("Apply penalte fee to " + getId());
+            LOGGER.info("Apply penalty fee to account " + getId());
             balance.decreaseAmount(penaltyFee);
             setPenaltyFeeApplied(true);
         }

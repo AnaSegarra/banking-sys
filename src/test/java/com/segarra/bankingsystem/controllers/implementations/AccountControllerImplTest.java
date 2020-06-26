@@ -1,5 +1,7 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
 import com.segarra.bankingsystem.models.Address;
@@ -42,6 +44,7 @@ class AccountControllerImplTest {
 
     @Autowired
     private WebApplicationContext wac;
+
     private MockMvc mockMvc;
     private AccountHolder accountHolder;
     private AccountHolder youngAccHolder;
@@ -49,6 +52,8 @@ class AccountControllerImplTest {
     private SavingsAccount savingsAccount;
     private StudentAccount studentAccount;
     private CreditCard creditCard;
+    private ObjectMapper objectMapper = new ObjectMapper();
+    private AccountRequest accountRequest;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +80,12 @@ class AccountControllerImplTest {
 
         creditCard = new CreditCard(accountHolder, new Money(new BigDecimal("4000")), new BigDecimal("200"), new BigDecimal("0.12"));
         creditCardRepository.save(creditCard);
+
+        accountRequest = new AccountRequest();
+        accountRequest.setPrimaryOwnerId(accountHolder.getId());
+        accountRequest.setSecretKey(1234);
+        accountRequest.setBalance(new Money(new BigDecimal("12000")));
+        accountRequest.setAccountType("checking");
     }
 
     @AfterEach
@@ -121,12 +132,13 @@ class AccountControllerImplTest {
                 .with(user("admin").roles("ADMIN"))).andExpect(status().isBadRequest());
     }
 
+    // TEST POST REQUESTS - create accounts
     @Test
     @DisplayName("Test post request to create a checking account")
     void create_CheckingAccount() throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "checking")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON)).
                 andExpect(status().isCreated()).andReturn();
         // minimum balance field is only present in checking accounts
@@ -136,9 +148,10 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a student checking account when primary account holder is under 24")
     void create_StudentCheckingAccount() throws Exception {
+        accountRequest.setPrimaryOwnerId(youngAccHolder.getId());
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "checking")
-                .content("{\"primaryOwnerId\":" + youngAccHolder.getId() + ",\"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
         // should create a student checking account which doesn't have a minimum balance
@@ -148,35 +161,42 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a credit card with default values for creditLimit and interestRate")
     void createCreditCard_DefaultValues() throws Exception {
+        accountRequest.setAccountType("credit-card");
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "credit-card")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
 
-        assertFalse(result.getResponse().getContentAsString().contains("\"creditLimit\": 100"));
-        assertFalse(result.getResponse().getContentAsString().contains("\"interestRate\": 0.2"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"creditLimit\":100"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"interestRate\":0.2"));
     }
 
     @Test
     @DisplayName("Test post request to create a credit card with chosen values for creditLimit and interestRate")
     void createCreditCard_ChosenValues() throws Exception {
+        accountRequest.setAccountType("credit-card");
+        accountRequest.setCreditCardLimit(new BigDecimal("200"));
+        accountRequest.setCardInterestRate(new BigDecimal("0.15"));
+
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "credit-card")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"creditCardLimit\": 200, \"cardInterestRate\": 0.15}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
 
-        assertFalse(result.getResponse().getContentAsString().contains("\"creditCardLimit\": 200"));
-        assertFalse(result.getResponse().getContentAsString().contains("\"cardInterestRate\": 0.15"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"creditLimit\":200"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"interestRate\":0.15"));
     }
 
     @Test
     @DisplayName("Test post request to create a credit card with value above limit for creditLimit, expected 400 status code")
     void createCreditCard_InvalidCreditLimit() throws Exception {
+        accountRequest.setAccountType("credit-card");
+        accountRequest.setCreditCardLimit(new BigDecimal("10"));
         mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type","credit-card")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"creditCardLimit\": 10}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -184,47 +204,57 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a savings account with default values for minimumBalance and interestRate")
     void createSavingsAccount_DefaultValues() throws Exception {
+        accountRequest.setAccountType("savings");
+
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "savings")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
 
-        assertFalse(result.getResponse().getContentAsString().contains("\"savingsInterestRate\": 0.0025"));
-        assertFalse(result.getResponse().getContentAsString().contains("\"savingsMinimumBalance\": 1000"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"interestRate\":0.0025"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"minimumBalance\":1000"));
     }
 
     @Test
     @DisplayName("Test post request to create a savings account with chosen values for minimumBalance and interestRate")
     void createSavingsAccount_ChosenValues() throws Exception {
+        accountRequest.setAccountType("savings");
+        accountRequest.setSavingsInterestRate(new BigDecimal("0.4"));
+        accountRequest.setSavingsMinimumBalance(new BigDecimal("800"));
+
         MvcResult result = mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "savings")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"savingsInterestRate\": 0.4, \"savingsMinimumBalance\": 800}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated()).andReturn();
 
-        assertFalse(result.getResponse().getContentAsString().contains("\"savingsInterestRate\": 0.4"));
-        assertFalse(result.getResponse().getContentAsString().contains("\"savingsMinimumBalance\": 800"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"interestRate\":0.4"));
+        assertTrue(result.getResponse().getContentAsString().contains("\"minimumBalance\":800"));
     }
 
     @Test
     @DisplayName("Test post request to create a savings account with value above limit for interestRate, expected 400 status code")
     void createSavingsAccount_InvalidInterestRate() throws Exception {
+        accountRequest.setAccountType("savings");
+        accountRequest.setSavingsInterestRate(new BigDecimal("10"));
+
         mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type","savings")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"balance\": {\"amount\": 1000}, \"savingsInterestRate\": 10}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
 
-    // test invalid requests (wrong owner id || wrong param)
+    // test invalid requests (wrong owner id || wrong account type)
     @Test
     @DisplayName("Test post request with wrong primary owner id, expected 400 status code")
     void create_invalidPrimaryOwnerId() throws Exception {
+        accountRequest.setPrimaryOwnerId(32);
         mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type","checking")
-                .content("{\"primaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -232,9 +262,10 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request with wrong secondary owner id, expected 400 status code")
     void create_invalidSecondaryOwnerId() throws Exception {
+        accountRequest.setSecondaryOwnerId(20);
         mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type","checking")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ",\"secondaryOwnerId\": 20, \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -242,9 +273,10 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request with wrong account type, expected 400 status code")
     void create_invalidAccountType() throws Exception {
+        accountRequest.setAccountType("student");
         mockMvc.perform(post("/api/v1/accounts")
-                .with(user("admin").roles("ADMIN")).param("type", "student-account")
-                .content("{\"primaryOwnerId\":" + accountHolder.getId() + ", \"secretKey\": 1234, \"balance\": {\"amount\": 12000}}")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

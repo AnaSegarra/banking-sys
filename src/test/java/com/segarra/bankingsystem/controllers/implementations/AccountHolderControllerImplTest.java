@@ -106,12 +106,4 @@ class AccountHolderControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    void getAllAccounts() {
-    }
-
-    @Test
-    void getAccountById() {
-    }
 }

@@ -11,6 +11,5 @@ import java.util.List;
 public interface AccountHolderController {
     List<AccountHolderVM> getAll();
     AccountHolder create(AccountHolder accountHolder);
-    List<AccountVM> getAllAccounts(User user);
     AccountVM getAccountById(int id, User user);
 }

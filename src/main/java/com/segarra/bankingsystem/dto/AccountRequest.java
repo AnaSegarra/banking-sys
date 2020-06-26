@@ -4,6 +4,7 @@ import com.segarra.bankingsystem.models.Money;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class AccountRequest {
@@ -11,7 +12,8 @@ public class AccountRequest {
     private int secondaryOwnerId;
     private Money balance;
     private int secretKey;
-
+    @NotNull(message = "Account type required: savings, checking or credit-card")
+    private String accountType;
     @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5")
     @DecimalMin(value = "0", message = "Interest rate shouldn't be a negative value")
     private BigDecimal savingsInterestRate;
@@ -31,7 +33,7 @@ public class AccountRequest {
 
     public AccountRequest(int primaryOwnerId, int secondaryOwnerId, Money balance, int secretKey,
                           BigDecimal savingsInterestRate, BigDecimal savingsMinimumBalance,
-                          BigDecimal creditCardLimit, BigDecimal cardInterestRate) {
+                          BigDecimal creditCardLimit, BigDecimal cardInterestRate, String accountType) {
         this.primaryOwnerId = primaryOwnerId;
         this.secondaryOwnerId = secondaryOwnerId;
         this.balance = balance;
@@ -40,6 +42,7 @@ public class AccountRequest {
         this.savingsMinimumBalance = savingsMinimumBalance;
         this.creditCardLimit = creditCardLimit;
         this.cardInterestRate = cardInterestRate;
+        this.accountType = accountType;
     }
 
     public int getPrimaryOwnerId() {
@@ -104,5 +107,13 @@ public class AccountRequest {
 
     public void setCardInterestRate(BigDecimal cardInterestRate) {
         this.cardInterestRate = cardInterestRate;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
     }
 }

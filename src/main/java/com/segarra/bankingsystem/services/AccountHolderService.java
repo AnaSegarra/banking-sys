@@ -53,7 +53,7 @@ public class AccountHolderService {
     public AccountHolder create(AccountHolder accountHolder){
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());
         if(foundUser != null){
-            LOGGER.error("Username taken - throw exception; status code 400");
+            LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
             throw new IllegalInputException("This username has already been taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -61,18 +61,10 @@ public class AccountHolderService {
         AccountHolder newUser = accountHolderRepository.save(accountHolder);
         Role role = new Role("ROLE_ACCOUNTHOLDER", newUser);
         roleRepository.save(role);
-        LOGGER.info("Accountholder created " + newUser);
+        LOGGER.info("Account holder created " + newUser);
         return newUser;
     }
 
-    @PreAuthorize("authenticated")
-    public List<AccountVM> getAllAccounts(User user){
-        List<Account> accounts = accountRepository.findAllUserAccounts(user.getId());
-        return accounts.stream().map(account -> new AccountVM(account.getId(), account.getBalance(),
-                account.getClass().getSimpleName(), account.getPrimaryOwner().getName(),
-                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned"))
-                .collect(Collectors.toList());
-    }
 
     @PreAuthorize("authenticated")
     public AccountVM getAccountById(int id, User user){

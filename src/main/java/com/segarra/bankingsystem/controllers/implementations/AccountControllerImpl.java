@@ -5,12 +5,15 @@ import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.AccountVM;
 import com.segarra.bankingsystem.dto.FinanceThirdPartyRequest;
 import com.segarra.bankingsystem.models.Account;
+import com.segarra.bankingsystem.models.User;
 import com.segarra.bankingsystem.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -32,14 +35,19 @@ public class AccountControllerImpl implements AccountController {
 
     @PostMapping("/accounts")
     @ResponseStatus(HttpStatus.CREATED)
-    public Account create(@RequestParam(name = "type") String accountType,
-                          @Valid @RequestBody AccountRequest newAccount) {
-        return accountService.create(accountType, newAccount);
+    public Account create(@RequestBody @Valid AccountRequest newAccount) {
+        return accountService.create(newAccount);
+    }
+
+    @GetMapping("/users/accounts")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AccountVM> getAllUserAccounts(@AuthenticationPrincipal User user){
+        return accountService.getAllUserAccounts(user);
     }
 
     @PostMapping("/third-parties/accounts/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void financeAccount(@PathVariable("id") int id, @Valid @RequestBody FinanceThirdPartyRequest financeThirdPartyRequest) {
+    public void financeAccount(@PathVariable("id") int id, @RequestBody @Valid FinanceThirdPartyRequest financeThirdPartyRequest) {
         accountService.financeAccount(id, financeThirdPartyRequest);
     }
 }

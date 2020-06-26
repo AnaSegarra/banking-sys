@@ -83,7 +83,7 @@ class AdminControllerImplTest {
         creditCard = new CreditCard(accountHolder, new Money(new BigDecimal("4000")), new BigDecimal("200"), new BigDecimal("0.12"));
         creditCardRepository.save(creditCard);
 
-        // ====
+        // ==== request objects
         debitRequest = new FinanceAdminRequest(new BigDecimal("100"), "debit");
         creditRequest = new FinanceAdminRequest(new BigDecimal("200"), "credit");
     }

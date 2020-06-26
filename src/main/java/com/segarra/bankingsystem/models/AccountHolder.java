@@ -106,10 +106,11 @@ public class AccountHolder extends User{
 
     @Override
     public String toString() {
-        return "AccountHolder {" +
+        return "{" +
                 "name='" + name + '\'' +
                 ", birthday=" + birthday +
-                ", username=" + getUsername() +
+                ", primaryAddress=" + primaryAddress +
+                ", mailingAddress=" + mailingAddress +
                 '}';
     }
 }

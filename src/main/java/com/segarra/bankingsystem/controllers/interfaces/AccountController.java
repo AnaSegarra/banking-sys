@@ -4,10 +4,14 @@ import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.AccountVM;
 import com.segarra.bankingsystem.dto.FinanceThirdPartyRequest;
 import com.segarra.bankingsystem.models.Account;
+import com.segarra.bankingsystem.models.User;
+
+import java.util.List;
 
 public interface AccountController {
-    Account create(String accountType, AccountRequest newAccount);
+    Account create(AccountRequest newAccount);
     AccountVM getById(int id);
+    List<AccountVM> getAllUserAccounts(User user);
     void financeAccount(int id, FinanceThirdPartyRequest financeAdminRequest);
     void unfreezeAccount(int id);
 }

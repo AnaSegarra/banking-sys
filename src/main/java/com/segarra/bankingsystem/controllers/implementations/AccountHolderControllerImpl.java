@@ -26,12 +26,6 @@ public class AccountHolderControllerImpl implements AccountHolderController {
         return accountHolderService.getAllAccountHolders();
     }
 
-    @GetMapping("/users/accounts")
-    @ResponseStatus(HttpStatus.OK)
-    public List<AccountVM> getAllAccounts(@AuthenticationPrincipal User user){
-        return accountHolderService.getAllAccounts(user);
-    }
-
     @GetMapping("/users/accounts/{id}")
     @ResponseStatus(HttpStatus.OK)
     public AccountVM getAccountById(@PathVariable int id, @AuthenticationPrincipal User user){

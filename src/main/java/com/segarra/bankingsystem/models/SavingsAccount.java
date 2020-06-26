@@ -1,20 +1,25 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
-import com.segarra.bankingsystem.utils.Money;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 
 @Entity
+@DynamicUpdate
 @Table(name = "savings_accounts")
 public class SavingsAccount extends Account {
     @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5")
+    @DecimalMin(value = "0", message = "Interest rate shouldn't be a negative value")
+    @Column(columnDefinition = "DECIMAL(5,4)")
     private BigDecimal interestRate;
     protected int secretKey;
     @Enumerated(value = EnumType.STRING)
@@ -22,30 +27,31 @@ public class SavingsAccount extends Account {
     @DecimalMax(value = "1000", message = "Minimum balance must be below 1000")
     @DecimalMin(value = "100", message = "Minimum balance must be above 100")
     private BigDecimal minimumBalance;
+    private LocalDateTime lastInterestApplied;
+
+    private static final Logger LOGGER = LogManager.getLogger(SavingsAccount.class);
 
     public SavingsAccount() {
-        setMinimumBalance(minimumBalance);
-        setInterestRate(interestRate);
     }
 
     public SavingsAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance,
-                          @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5") BigDecimal interestRate,
-                          int secretKey, @DecimalMax(value = "1000") @DecimalMin(value = "100") BigDecimal minimumBalance) {
+                          BigDecimal interestRate, int secretKey, BigDecimal minimumBalance) {
         super(primaryOwner, secondaryOwner, balance);
-        setInterestRate(interestRate);
         this.secretKey = secretKey;
-        this.status = Status.ACTIVE;
+        setInterestRate(interestRate);
         setMinimumBalance(minimumBalance);
+        this.status = Status.ACTIVE;
+        this.lastInterestApplied = LocalDateTime.now();
     }
 
-    public SavingsAccount(AccountHolder primaryOwner, Money balance,
-                          @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5") BigDecimal interestRate,
-                          int secretKey, @DecimalMax(value = "1000") @DecimalMin(value = "100") BigDecimal minimumBalance) {
+    public SavingsAccount(AccountHolder primaryOwner, Money balance, BigDecimal interestRate, int secretKey,
+                          BigDecimal minimumBalance) {
         super(primaryOwner, balance);
-        setInterestRate(interestRate);
         this.secretKey = secretKey;
-        this.status = Status.ACTIVE;
+        setInterestRate(interestRate);
         setMinimumBalance(minimumBalance);
+        this.status = Status.ACTIVE;
+        this.lastInterestApplied = LocalDateTime.now();
     }
 
     public BigDecimal getInterestRate() {
@@ -78,5 +84,26 @@ public class SavingsAccount extends Account {
 
     public void setMinimumBalance(BigDecimal minimumBalance) {
         this.minimumBalance = minimumBalance == null ? new BigDecimal("1000") : minimumBalance;
+    }
+
+    public LocalDateTime getLastInterestApplied() {
+        return lastInterestApplied;
+    }
+
+    public void setLastInterestApplied(LocalDateTime lastInterestApplied) {
+        this.lastInterestApplied = lastInterestApplied;
+    }
+
+    public void applyAnnualInterest(){
+        int years = Period.between(LocalDate.from(lastInterestApplied), LocalDate.now()).getYears();
+        if(years > 0){
+            LOGGER.info("Apply " + years + " time(s) the annual interestRate to savings account " + this.getId());
+            for(int i = 0; i < years; i++){
+                BigDecimal interest = balance.getAmount().multiply(interestRate);
+                LOGGER.info("Balance increased by " + interest);
+                balance.increaseAmount(interest);
+            }
+            lastInterestApplied = lastInterestApplied.plusYears(years);
+        }
     }
 }

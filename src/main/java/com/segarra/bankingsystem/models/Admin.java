@@ -1,4 +1,14 @@
 package com.segarra.bankingsystem.models;
 
-public class Admin {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "admins")
+public class Admin extends User{
+    public Admin() {
+    }
+
+    public Admin(String username, String password) {
+        super(username, password);
+    }
 }

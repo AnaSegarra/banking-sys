@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
-import com.segarra.bankingsystem.utils.Money;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
+@DynamicUpdate
 @Table(name = "student_accounts")
 public class StudentAccount extends Account {
     protected int secretKey;
@@ -16,7 +17,6 @@ public class StudentAccount extends Account {
     protected Status status;
 
     public StudentAccount() {
-        this.status = Status.ACTIVE;
     }
 
     public StudentAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance, int secretKey) {
@@ -45,17 +45,5 @@ public class StudentAccount extends Account {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    @Override
-    public String toString() {
-        return "StudentAccount{" +
-                "primaryOwner=" + primaryOwner +
-                ", secondaryOwner=" + secondaryOwner +
-                ", balance=" + balance +
-                ", penaltyFee=" + penaltyFee +
-                ", secretKey=" + secretKey +
-                ", status=" + status +
-                '}';
     }
 }

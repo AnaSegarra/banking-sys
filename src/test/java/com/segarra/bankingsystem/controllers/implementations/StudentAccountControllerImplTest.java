@@ -4,8 +4,8 @@ import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.StudentAccount;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
 import com.segarra.bankingsystem.repositories.StudentAccountRepository;
-import com.segarra.bankingsystem.utils.Address;
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Address;
+import com.segarra.bankingsystem.models.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,9 +39,9 @@ class StudentAccountControllerImplTest {
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"));
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
         AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"));
+                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "gabi_c");
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,
@@ -62,6 +61,6 @@ class StudentAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all student accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/student-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/student-accounts")).andExpect(status().isOk());
     }
 }

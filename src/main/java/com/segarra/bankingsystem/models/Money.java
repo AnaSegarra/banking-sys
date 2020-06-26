@@ -1,4 +1,4 @@
-package com.segarra.bankingsystem.utils;
+package com.segarra.bankingsystem.models;
 
 import javax.persistence.Embeddable;
 import java.math.BigDecimal;

@@ -9,7 +9,21 @@ import java.io.IOException;
 @ControllerAdvice
 public class GlobalHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
-    public void handleDataNotFoundException(ResourceNotFoundException e, HttpServletResponse response) throws IOException {
+    public void handleResourceNotFoundException(ResourceNotFoundException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalTransactionException.class)
+    public void handleIllegalTransactionException(IllegalTransactionException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+    }
+
+    @ExceptionHandler(FrozenAccountException.class)
+    public void handleFrozenAccountException(FrozenAccountException e, HttpServletResponse response) throws IOException {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+    }
+    @ExceptionHandler(IllegalInputException.class)
+    public void handleIllegalInputException(IllegalInputException e, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
 

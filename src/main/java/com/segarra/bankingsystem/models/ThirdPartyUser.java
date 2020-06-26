@@ -1,4 +1,15 @@
 package com.segarra.bankingsystem.models;
 
-public class ThirdPartyUser {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "third_parties")
+public class ThirdPartyUser extends User{
+
+    public ThirdPartyUser() {
+    }
+
+    public ThirdPartyUser(String username, String password) {
+        super(username, password);
+    }
 }

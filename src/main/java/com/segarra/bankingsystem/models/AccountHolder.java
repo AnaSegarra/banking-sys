@@ -1,8 +1,6 @@
 package com.segarra.bankingsystem.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.segarra.bankingsystem.utils.Address;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -13,20 +11,15 @@ import java.util.List;
 
 @Entity
 @Table(name = "account_holders")
-public class AccountHolder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class AccountHolder extends User{
     @NotBlank(message = "Name is required")
     private String name;
     @NotNull(message = "Birthday is required")
     private LocalDate birthday;
-
     @Valid
     @NotNull(message = "A primary address is required")
     @Embedded
     private Address primaryAddress;
-
     @Valid
     @Embedded
     @AttributeOverrides({
@@ -37,11 +30,9 @@ public class AccountHolder {
             @AttributeOverride(name = "zipCode", column = @Column(name = "mail_zip_code"))
     })
     private Address mailingAddress;
-
     @OneToMany(mappedBy = "primaryOwner")
     @JsonIgnore
     private List<Account> accounts;
-
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
     private List<Account> secondaryAccounts;
@@ -49,25 +40,20 @@ public class AccountHolder {
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username) {
+        super(username, password);
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password,
+                         String username, Address mailingAddress) {
+        super(username, password);
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public List<Account> getAccounts() {
@@ -116,6 +102,15 @@ public class AccountHolder {
 
     public void setMailingAddress(Address mailingAddress) {
         this.mailingAddress = mailingAddress;
+    }
+
+    @Override
+    public String toString() {
+        return "AccountHolder {" +
+                "name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", username=" + getUsername() +
+                '}';
     }
 }
 

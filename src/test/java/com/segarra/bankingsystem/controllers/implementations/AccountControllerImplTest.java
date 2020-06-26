@@ -2,8 +2,8 @@ package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
-import com.segarra.bankingsystem.utils.Address;
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Address;
+import com.segarra.bankingsystem.models.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

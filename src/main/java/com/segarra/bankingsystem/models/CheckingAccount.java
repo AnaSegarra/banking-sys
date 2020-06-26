@@ -1,9 +1,9 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
-import com.segarra.bankingsystem.utils.Money;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 @Entity
+@DynamicUpdate
 @Table(name = "checking_accounts")
 public class CheckingAccount extends Account {
     private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");

@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.controllers.interfaces;
 
-import com.segarra.bankingsystem.dto.DebitCreditRequest;
+import com.segarra.bankingsystem.dto.FinanceAdminRequest;
 
 public interface AdminController {
-    void financeAccount(int id, DebitCreditRequest debitCreditRequest);
+    void financeAccount(int id, FinanceAdminRequest financeAdminRequest);
 }

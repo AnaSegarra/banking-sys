@@ -3,6 +3,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 import com.segarra.bankingsystem.controllers.interfaces.AccountController;
 import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.AccountVM;
+import com.segarra.bankingsystem.dto.FinanceThirdPartyRequest;
 import com.segarra.bankingsystem.models.Account;
 import com.segarra.bankingsystem.services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,15 @@ public class AccountControllerImpl implements AccountController {
     private AccountService accountService;
 
     @GetMapping("/accounts/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public AccountVM getById(@PathVariable int id) {
         return accountService.getById(id);
+    }
+
+    @PatchMapping("/accounts/{id}/status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unfreezeAccount(@PathVariable int id) {
+        accountService.unfreezeAccount(id);
     }
 
     @PostMapping("/accounts")
@@ -28,5 +35,11 @@ public class AccountControllerImpl implements AccountController {
     public Account create(@RequestParam(name = "type") String accountType,
                           @Valid @RequestBody AccountRequest newAccount) {
         return accountService.create(accountType, newAccount);
+    }
+
+    @PostMapping("/third-parties/accounts/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void financeAccount(@PathVariable("id") int id, @Valid @RequestBody FinanceThirdPartyRequest financeThirdPartyRequest) {
+        accountService.financeAccount(id, financeThirdPartyRequest);
     }
 }

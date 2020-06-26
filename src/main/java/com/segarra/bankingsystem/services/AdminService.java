@@ -1,6 +1,6 @@
 package com.segarra.bankingsystem.services;
 
-import com.segarra.bankingsystem.dto.DebitCreditRequest;
+import com.segarra.bankingsystem.dto.FinanceAdminRequest;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.exceptions.ResourceNotFoundException;
 import com.segarra.bankingsystem.models.*;
@@ -35,32 +35,32 @@ public class AdminService {
     }
 
     @Secured({"ROLE_ADMIN"})
-    public void financeAccount(int accountId, DebitCreditRequest debitCreditRequest){
+    public void financeAccount(int accountId, FinanceAdminRequest financeAdminRequest){
         Account account = accountRepository.findById(accountId).orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
 
         if (account instanceof CheckingAccount) {
             CheckingAccount checkingAccount = (CheckingAccount) account;
             checkingAccount.applyMonthlyMaintenanceFee();
-            applyFinance(checkingAccount, debitCreditRequest.getOperation().toLowerCase(), debitCreditRequest.getAmount());
+            applyFinance(checkingAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             checkingAccount.applyPenaltyFee(checkingAccount.getMinimumBalance());
             checkingAccountRepository.save(checkingAccount);
 
         } else if (account instanceof SavingsAccount) {
             SavingsAccount savingsAccount = (SavingsAccount) account;
             savingsAccount.applyAnnualInterest();
-            applyFinance(savingsAccount, debitCreditRequest.getOperation().toLowerCase(), debitCreditRequest.getAmount());
+            applyFinance(savingsAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             savingsAccount.applyPenaltyFee(savingsAccount.getMinimumBalance());
             savingsAccountRepository.save(savingsAccount);
 
         } else if (account instanceof CreditCard) {
             CreditCard creditCard = (CreditCard) account;
             creditCard.applyMonthlyInterest();
-            applyFinance(creditCard, debitCreditRequest.getOperation().toLowerCase(), debitCreditRequest.getAmount());
+            applyFinance(creditCard, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             creditCardRepository.save(creditCard);
 
         } else if (account instanceof StudentAccount) {
             StudentAccount studentAccount = (StudentAccount) account;
-            applyFinance(studentAccount, debitCreditRequest.getOperation().toLowerCase(), debitCreditRequest.getAmount());
+            applyFinance(studentAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             studentAccountRepository.save(studentAccount);
         }
     }

@@ -48,10 +48,11 @@ public class AccountHolderService {
                         accountHolder.getMailingAddress())).collect(Collectors.toList());
     }
 
+    @Secured({"ROLE_ADMIN"})
     public AccountHolder create(AccountHolder accountHolder){
-        Optional<AccountHolder> foundUser = accountHolderRepository.findByUsername(accountHolder.getUsername());
-        if(foundUser.isPresent()){
-            LOGGER.info("Username taken - throw exception; status code 400");
+        User foundUser = userRepository.findByUsername(accountHolder.getUsername());
+        if(foundUser != null){
+            LOGGER.error("Username taken - throw exception; status code 400");
             throw new IllegalInputException("This username has already been taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

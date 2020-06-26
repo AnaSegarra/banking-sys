@@ -1,11 +1,11 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.segarra.bankingsystem.dto.DebitCreditRequest;
+import com.segarra.bankingsystem.dto.FinanceAdminRequest;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
-import com.segarra.bankingsystem.utils.Address;
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Address;
+import com.segarra.bankingsystem.models.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -55,8 +53,8 @@ class AdminControllerImplTest {
     private SavingsAccount savingsAccount;
     private StudentAccount studentAccount;
     private CreditCard creditCard;
-    private DebitCreditRequest debitRequest;
-    private DebitCreditRequest creditRequest;
+    private FinanceAdminRequest debitRequest;
+    private FinanceAdminRequest creditRequest;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -86,8 +84,8 @@ class AdminControllerImplTest {
         creditCardRepository.save(creditCard);
 
         // ====
-        debitRequest = new DebitCreditRequest(new BigDecimal("100"), "debit");
-        creditRequest = new DebitCreditRequest(new BigDecimal("200"), "credit");
+        debitRequest = new FinanceAdminRequest(new BigDecimal("100"), "debit");
+        creditRequest = new FinanceAdminRequest(new BigDecimal("200"), "credit");
     }
 
     @AfterEach
@@ -158,7 +156,7 @@ class AdminControllerImplTest {
     @Test
     @DisplayName("Test finance account with invalid operation type, expected expected 400 status code")
     void financeAccount_InvalidOperationType() throws Exception {
-        DebitCreditRequest invalidRequest = new DebitCreditRequest(new BigDecimal("200"), "finance");
+        FinanceAdminRequest invalidRequest = new FinanceAdminRequest(new BigDecimal("200"), "finance");
 
         mockMvc.perform(post("/api/v1/accounts/" + checkingAccount.getId())
                 .with(user("admin").roles("ADMIN"))

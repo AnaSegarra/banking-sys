@@ -1,14 +1,11 @@
 package com.segarra.bankingsystem.services;
 
 import com.segarra.bankingsystem.models.AccountHolder;
-import com.segarra.bankingsystem.models.CheckingAccount;
 import com.segarra.bankingsystem.models.CreditCard;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
-import com.segarra.bankingsystem.repositories.CheckingAccountRepository;
 import com.segarra.bankingsystem.repositories.CreditCardRepository;
-import com.segarra.bankingsystem.repositories.StudentAccountRepository;
-import com.segarra.bankingsystem.utils.Address;
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Address;
+import com.segarra.bankingsystem.models.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

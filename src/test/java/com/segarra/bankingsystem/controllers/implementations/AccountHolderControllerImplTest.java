@@ -3,7 +3,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
-import com.segarra.bankingsystem.utils.Address;
+import com.segarra.bankingsystem.models.Address;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

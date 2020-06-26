@@ -1,6 +1,6 @@
 package com.segarra.bankingsystem.dto;
 
-import com.segarra.bankingsystem.utils.Address;
+import com.segarra.bankingsystem.models.Address;
 
 import java.time.LocalDate;
 
@@ -11,6 +11,9 @@ public class AccountHolderVM {
     private LocalDate birthday;
     private Address primaryAddress;
     private Address mailingAddress;
+
+    public AccountHolderVM() {
+    }
 
     public AccountHolderVM(int id, String name, String username, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
         this.id = id;
@@ -59,5 +62,13 @@ public class AccountHolderVM {
 
     public void setMailingAddress(Address mailingAddress) {
         this.mailingAddress = mailingAddress;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

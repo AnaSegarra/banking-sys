@@ -4,7 +4,7 @@ import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.Role;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
 import com.segarra.bankingsystem.repositories.RoleRepository;
-import com.segarra.bankingsystem.utils.Address;
+import com.segarra.bankingsystem.models.Address;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

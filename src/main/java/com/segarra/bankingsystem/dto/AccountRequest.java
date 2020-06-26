@@ -1,6 +1,6 @@
 package com.segarra.bankingsystem.dto;
 
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Money;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;

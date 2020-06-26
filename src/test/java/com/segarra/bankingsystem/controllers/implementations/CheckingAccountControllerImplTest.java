@@ -5,8 +5,8 @@ import com.segarra.bankingsystem.models.CheckingAccount;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
 import com.segarra.bankingsystem.repositories.CheckingAccountRepository;
 import com.segarra.bankingsystem.repositories.StudentAccountRepository;
-import com.segarra.bankingsystem.utils.Address;
-import com.segarra.bankingsystem.utils.Money;
+import com.segarra.bankingsystem.models.Address;
+import com.segarra.bankingsystem.models.Money;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

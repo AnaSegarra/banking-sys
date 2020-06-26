@@ -1,9 +1,9 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
-import com.segarra.bankingsystem.utils.Money;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 
 @Entity
+@DynamicUpdate
 @Table(name = "savings_accounts")
 public class SavingsAccount extends Account {
     @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5")

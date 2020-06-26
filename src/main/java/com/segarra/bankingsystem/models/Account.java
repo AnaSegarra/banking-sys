@@ -1,6 +1,5 @@
 package com.segarra.bankingsystem.models;
 
-import com.segarra.bankingsystem.utils.Money;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

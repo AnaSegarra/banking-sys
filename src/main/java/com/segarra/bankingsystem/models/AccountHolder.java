@@ -1,8 +1,6 @@
 package com.segarra.bankingsystem.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.segarra.bankingsystem.utils.Address;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import javax.validation.Valid;

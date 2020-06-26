@@ -4,18 +4,21 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public class DebitCreditRequest {
+public class FinanceThirdPartyRequest {
     @DecimalMin(value = "0", message = "Transaction amount must be above 0", inclusive = false)
     private BigDecimal amount;
     @NotNull(message = "Operation type required: debit or credit")
     private String operation;
+    @NotNull(message = "Account secret key is required")
+    private int secretKey;
 
-    public DebitCreditRequest() {
+    public FinanceThirdPartyRequest() {
     }
 
-    public DebitCreditRequest(BigDecimal amount, String operation) {
+    public FinanceThirdPartyRequest(BigDecimal amount, String operation, int secretKey) {
         this.amount = amount;
         this.operation = operation;
+        this.secretKey = secretKey;
     }
 
     public BigDecimal getAmount() {
@@ -34,5 +37,11 @@ public class DebitCreditRequest {
         this.operation = operation;
     }
 
+    public int getSecretKey() {
+        return secretKey;
+    }
 
+    public void setSecretKey(int secretKey) {
+        this.secretKey = secretKey;
+    }
 }

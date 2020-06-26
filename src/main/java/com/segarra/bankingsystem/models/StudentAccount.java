@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.models;
 
 import com.segarra.bankingsystem.enums.Status;
-import com.segarra.bankingsystem.utils.Money;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Entity
+@DynamicUpdate
 @Table(name = "student_accounts")
 public class StudentAccount extends Account {
     protected int secretKey;

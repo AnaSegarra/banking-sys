@@ -3,6 +3,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.FinanceAdminRequest;
+import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
 import com.segarra.bankingsystem.models.Address;
@@ -105,6 +106,8 @@ class AccountControllerImplTest {
         accountHolderRepository.deleteAll();
     }
 
+
+    /* ADMIN - get account by id */
     @Test
     @DisplayName("Test get by id of a checking account")
     void getById_CheckingAccount() throws Exception {
@@ -140,7 +143,7 @@ class AccountControllerImplTest {
                 .with(user("admin").roles("ADMIN"))).andExpect(status().isBadRequest());
     }
 
-    // TEST POST REQUESTS - create accounts
+    /* TEST POST REQUESTS - create accounts */
     @Test
     @DisplayName("Test post request to create a checking account")
     void create_CheckingAccount() throws Exception {
@@ -255,7 +258,7 @@ class AccountControllerImplTest {
     }
 
 
-    // test invalid requests (wrong owner id || wrong account type)
+    // test invalid POST requests (wrong owner id || wrong account type)
     @Test
     @DisplayName("Test post request with wrong primary owner id, expected 400 status code")
     void create_invalidPrimaryOwnerId() throws Exception {
@@ -289,6 +292,7 @@ class AccountControllerImplTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /* TEST ADMIN DEBIT & CREDIT ACTIONS */
     @Test
     @DisplayName("Test debit checking account, expected reduced balance")
     void financeAccount_DebitCheckingAccount() throws Exception {
@@ -334,7 +338,7 @@ class AccountControllerImplTest {
     }
 
 
-    // TEST INVALID REQUESTS
+    // invalid debit/credit requests
     @Test
     @DisplayName("Test debit/credit an account that doesn't exist, expected expected 400 status code")
     void financeAccount_InvalidAccountId() throws Exception {
@@ -355,5 +359,87 @@ class AccountControllerImplTest {
                 .content(objectMapper.writeValueAsString(invalidRequest))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
+    }
+
+    /* TEST PATCH REQUEST - unfreeze account by an admin*/
+    @Test
+    @DisplayName("Test patch request to unfreeze savings account")
+    void unfreezeAccount_SavingsAccount() throws Exception {
+        savingsAccount.setStatus(Status.FROZEN);
+        savingsAccountRepository.save(savingsAccount);
+        mockMvc.perform(patch("/api/v1/accounts/"+ savingsAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals(Status.ACTIVE, savingsAccountRepository.findById(savingsAccount.getId()).get().getStatus());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze savings account already active, expected 400 status code")
+    void unfreezeAccount_SavingsAccount_InvalidRequest() throws Exception {
+        mockMvc.perform(patch("/api/v1/accounts/"+ savingsAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze checking account")
+    void unfreezeAccount_CheckingAccount() throws Exception {
+        checkingAccount.setStatus(Status.FROZEN);
+        checkingAccountRepository.save(checkingAccount);
+        mockMvc.perform(patch("/api/v1/accounts/"+ checkingAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals(Status.ACTIVE, checkingAccountRepository.findById(checkingAccount.getId()).get().getStatus());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze checking account already active, expected 400 status code")
+    void unfreezeAccount_CheckingAccount_InvalidRequest() throws Exception {
+        mockMvc.perform(patch("/api/v1/accounts/"+ checkingAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze student account")
+    void unfreezeAccount_StudentAccount() throws Exception {
+        studentAccount.setStatus(Status.FROZEN);
+        studentAccountRepository.save(studentAccount);
+        mockMvc.perform(patch("/api/v1/accounts/"+ studentAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals(Status.ACTIVE, studentAccountRepository.findById(studentAccount.getId()).get().getStatus());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze student account already active, expected 400 status code")
+    void unfreezeAccount_StudentAccount_InvalidRequest() throws Exception {
+        mockMvc.perform(patch("/api/v1/accounts/"+ studentAccount.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test patch request to unfreeze a credit card, expected 400 status code")
+    void unfreezeAccount_InvalidAccountId() throws Exception {
+        mockMvc.perform(patch("/api/v1/accounts/"+ creditCard.getId() +"/status")
+                .with(user("admin").roles("ADMIN"))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void getAllUserAccounts() {
+    }
+
+    @Test
+    void getById() {
+    }
+
+    @Test
+    void financeAccount() {
     }
 }

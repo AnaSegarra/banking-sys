@@ -165,31 +165,39 @@ public class AccountService {
     @Secured({"ROLE_ADMIN"})
     public void unfreezeAccount(int accountId){
         Account account = accountRepository.findById(accountId).orElseThrow(()->new ResourceNotFoundException("Account with id " + accountId + " not found"));
+
         if(account instanceof CreditCard){
+            LOGGER.error("Controlled exception - Id " + accountId + " matches a credit card");
             throw new IllegalInputException("Credit card " + accountId + " doesn't have a status");
         } else if (account instanceof CheckingAccount) {
             CheckingAccount checkingAccount = (CheckingAccount) account;
             if(checkingAccount.getStatus() == Status.ACTIVE){
+                LOGGER.error("Controlled exception - Checking account " + accountId + " is already active");
                 throw new IllegalInputException("Account " + accountId + " is already active");
             }
             checkingAccount.setStatus(Status.ACTIVE);
             checkingAccountRepository.save(checkingAccount);
+            LOGGER.info("Checking account " + accountId + " successfully updated");
 
         } else if (account instanceof SavingsAccount) {
             SavingsAccount savingsAccount = (SavingsAccount) account;
             if(savingsAccount.getStatus() == Status.ACTIVE){
-                throw new IllegalInputException("Account " + accountId + " is already active");
+                LOGGER.error("Controlled exception - Savings account " + accountId + " is already active");
+                throw new IllegalInputException("Savings account " + accountId + " is already active");
             }
             savingsAccount.setStatus(Status.ACTIVE);
             savingsAccountRepository.save(savingsAccount);
+            LOGGER.info("Savings account " + accountId + " successfully updated");
 
         } else if (account instanceof StudentAccount) {
             StudentAccount studentAccount = (StudentAccount) account;
             if(studentAccount.getStatus() == Status.ACTIVE){
-                throw new IllegalInputException("Account " + accountId + " is already active");
+                LOGGER.error("Controlled exception - Student account " + accountId + " is already active");
+                throw new IllegalInputException("Student account " + accountId + " is already active");
             }
             studentAccount.setStatus(Status.ACTIVE);
             studentAccountRepository.save(studentAccount);
+            LOGGER.info("Student account " + accountId + " successfully updated");
         }
 
     }

@@ -11,6 +11,7 @@ import java.util.List;
 public interface AccountController {
     Account create(AccountRequest newAccount);
     AccountVM getById(int id);
+    AccountVM getById(int id, User user);
     List<AccountVM> getAllUserAccounts(User user);
     void financeAccount(int id, FinanceThirdPartyRequest financeAdminRequest);
     void unfreezeAccount(int id);

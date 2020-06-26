@@ -45,6 +45,12 @@ public class AccountControllerImpl implements AccountController {
         return accountService.getAllUserAccounts(user);
     }
 
+    @GetMapping("/users/accounts/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public AccountVM getById(@PathVariable int id, @AuthenticationPrincipal User user){
+        return accountService.getById(id, user);
+    }
+
     @PostMapping("/third-parties/accounts/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void financeAccount(@PathVariable("id") int id, @RequestBody @Valid FinanceThirdPartyRequest financeThirdPartyRequest) {

@@ -35,32 +35,91 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    private static final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
+    private static final Logger LOGGER = LogManager.getLogger(AccountService.class);
 
     // retrieve any account by id - admin restricted
     @Secured({"ROLE_ADMIN"})
     public AccountVM getById(int id){
         Account account = accountRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Account with id " + id + " not found"));
         if (account instanceof CheckingAccount) {
+            LOGGER.info("Admin GET request to retrieve checking account with id " + id);
             return new AccountVM(account.getId(), account.getBalance(), "Checking account", account.getPrimaryOwner().getName(),
                     account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName()  : "No secondary owner assigned",  ((CheckingAccount) account).getStatus().toString());
         }
         if (account instanceof SavingsAccount) {
+            LOGGER.info("Admin GET request to retrieve savings account with id " + id);
             return new AccountVM(account.getId(), account.getBalance(),
                     "Savings account", account.getPrimaryOwner().getName(),
                     account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((SavingsAccount) account).getStatus().toString());
 
         }
         if (account instanceof CreditCard) {
+            LOGGER.info("Admin GET request to retrieve credit card with id " + id);
             return new AccountVM(account.getId(), account.getBalance(),
                     "Credit card", account.getPrimaryOwner().getName(),
-                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned");
+                    account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", "NONE");
         }
 
         // student account
+        LOGGER.info("Admin GET request to retrieve student account with id " + id);
         return new AccountVM(account.getId(), account.getBalance(), "Student account", account.getPrimaryOwner().getName(),
-                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((StudentAccount) account).getStatus().toString());
+                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned",
+                ((StudentAccount) account).getStatus().toString());
 
+    }
+
+    // retrieve account by id from logged user - user restricted
+    @PreAuthorize("authenticated")
+    public AccountVM getById(int id, User user){
+        Account account = accountRepository.findUserAccountById(user.getId(), id);
+
+        if(account instanceof CheckingAccount){
+            LOGGER.info("User GET request to retrieve checking account with id " + id);
+
+            CheckingAccount checkingAccount = (CheckingAccount) account;
+            checkingAccount.applyMonthlyMaintenanceFee();
+            checkingAccountRepository.save(checkingAccount);
+
+            return new AccountVM(checkingAccount.getId(), checkingAccount.getBalance(), "Checking account", checkingAccount.getPrimaryOwner().getName(),
+                    checkingAccount.getSecondaryOwner() != null ? checkingAccount.getSecondaryOwner().getName() : "No secondary owner assigned",
+                    checkingAccount.getStatus().toString());
+        }
+        if(account instanceof SavingsAccount){
+            LOGGER.info("User GET request to retrieve savings account with id " + id);
+
+            SavingsAccount savingsAccount = (SavingsAccount) account;
+            savingsAccount.applyAnnualInterest();
+            savingsAccountRepository.save(savingsAccount);
+
+            return new AccountVM(savingsAccount.getId(), savingsAccount.getBalance(), "Savings account", savingsAccount.getPrimaryOwner().getName(),
+                    savingsAccount.getSecondaryOwner() != null ? savingsAccount.getSecondaryOwner().getName() : "No secondary owner assigned",
+                    savingsAccount.getStatus().toString());
+        }
+
+        if(account instanceof StudentAccount){
+            LOGGER.info("User GET request to retrieve student account with id " + id);
+
+            StudentAccount studentAccount = (StudentAccount) account;
+
+            return new AccountVM(studentAccount.getId(), studentAccount.getBalance(), "Student account", studentAccount.getPrimaryOwner().getName(),
+                    studentAccount.getSecondaryOwner() != null ? studentAccount.getSecondaryOwner().getName() : "No secondary owner assigned",
+                    studentAccount.getStatus().toString());
+        }
+
+        if(account instanceof CreditCard){
+            LOGGER.info("User GET request to retrieve credit card with id " + id);
+
+            CreditCard creditCard = (CreditCard) account;
+
+            creditCard.applyMonthlyInterest();
+            creditCardRepository.save(creditCard);
+            return new AccountVM(creditCard.getId(), creditCard.getBalance(), "Credit card", creditCard.getPrimaryOwner().getName(),
+                    creditCard.getSecondaryOwner() != null ? creditCard.getSecondaryOwner().getName() : "No secondary owner assigned",
+                    "NONE");
+        }
+
+        LOGGER.error("Controlled exception - Account with id " + id + " not found");
+        throw new ResourceNotFoundException("Account with id " + id + " not found");
     }
 
     // create accounts of any type - admin restricted
@@ -103,6 +162,7 @@ public class AccountService {
         throw new IllegalInputException("Must enter a valid account type of either savings, checking or credit-card");
     }
 
+    // update account status to ACTIVE - admin restricted
     @Secured({"ROLE_ADMIN"})
     public void unfreezeAccount(int accountId){
         Account account = accountRepository.findById(accountId).orElseThrow(()->new ResourceNotFoundException("Account with id " + accountId + " not found"));
@@ -145,8 +205,7 @@ public class AccountService {
         }
     }
 
-
-    // debit or credit accounts, account secret key required - third party restricted
+    // debit or credit accounts; account secret key required - third party restricted
     @Secured({"ROLE_THIRDPARTY"})
     public void financeAccount(int accountId, FinanceThirdPartyRequest financeThirdPartyRequestRequest){
         Account account = accountRepository.findById(accountId).orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));

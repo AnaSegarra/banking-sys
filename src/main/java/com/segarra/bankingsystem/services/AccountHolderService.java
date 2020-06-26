@@ -35,6 +35,7 @@ public class AccountHolderService {
                         accountHolder.getMailingAddress())).collect(Collectors.toList());
     }
 
+    // create new account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
     public AccountHolder create(AccountHolder accountHolder){
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());

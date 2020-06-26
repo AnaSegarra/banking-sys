@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,7 +32,6 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
 
     private static final Logger LOGGER = LogManager.getLogger(TransactionService.class);
-
 
     public boolean checkFraud(Account account, LocalDateTime date, BigDecimal transaction){
         BigDecimal highest = transactionRepository.findHighestDailyTransactionByCustomer(date, account);
@@ -62,6 +60,7 @@ public class TransactionService {
     public void makeTransaction(TransactionRequest transaction, User user){
         // throw error if accounts ids are the same
         if(transaction.getRecipientId() == transaction.getSenderId()){
+            LOGGER.error("Controlled exception - Recipient and sender accounts are the same");
             throw new IllegalInputException("Recipient account must be different from sender account");
         }
         Account senderAccount = accountRepository.findById(transaction.getSenderId())
@@ -69,30 +68,46 @@ public class TransactionService {
         Account recipientAccount = accountRepository.findById(transaction.getRecipientId())
                 .orElseThrow(()-> new ResourceNotFoundException("Recipient account with id " + transaction.getRecipientId() + " not found"));
 
+        // verify sender account ownership
+        if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+            if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                LOGGER.error("Controlled exception - " + user.getUsername() + " tried to access an account not owned by them");
+                throw new IllegalTransactionException("Unable to access this account"); // throws 403 Forbidden
+            }
+        }
+
+        // verify recipient's ownership
+        if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
+            if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
+                LOGGER.error("Controlled exception - " + transaction.getRecipientName() + " is not the owner nor the co-owner of account " + transaction.getRecipientId());
+                throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
+            }
+        }
+
+        // check sender account funds
+        if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
+            LOGGER.error("Controlled exception - Account " + senderAccount.getId() + " doesn't have enough funds");
+            throw new IllegalInputException("Unable to make this transfer: insufficient funds");
+        }
+
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         // SENDER
         if (senderAccount instanceof SavingsAccount) {
-            // check ownership
-            if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
-                if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                    LOGGER.error("Controlled exception - " + user.getUsername() + " tried to access an account not owned by them");
-                    throw new IllegalTransactionException("Unable to access this account"); // throws 403 Forbidden
-                }
-            }
             SavingsAccount savingsAccount = (SavingsAccount) senderAccount;
             if(savingsAccount.getStatus().equals(Status.FROZEN)){
+                LOGGER.error("Controlled exception - Account " + senderAccount.getId() + " is frozen");
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
-            if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
-            }
 
+            // fraud detection
             if(checkFraud(savingsAccount, newTransaction.getDate(), transaction.getAmount())){
                 savingsAccount.setStatus(Status.FROZEN);
                 savingsAccountRepository.save(savingsAccount);
+                LOGGER.error("Controlled exception - Freeze account " + senderAccount.getId() +  " due to possible fraud");
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
+
             savingsAccount.applyAnnualInterest();
             newTransaction.setSenderId(savingsAccount);
             savingsAccount.getBalance().decreaseAmount(transaction.getAmount());
@@ -100,23 +115,17 @@ public class TransactionService {
             savingsAccountRepository.save(savingsAccount);
 
         } else if (senderAccount instanceof CheckingAccount) {
-            // check ownership
-            if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
-                if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                    throw new IllegalTransactionException("Unable to access this account");
-                }
-            }
-
             CheckingAccount checkingAccount = (CheckingAccount) senderAccount;
             if(checkingAccount.getStatus().equals(Status.FROZEN)){
+                LOGGER.error("Controlled exception - Account " + senderAccount.getId() + " is frozen");
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
-            if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
-            }
+
+            // fraud detection
             if(checkFraud(checkingAccount, newTransaction.getDate(), transaction.getAmount())){
                 checkingAccount.setStatus(Status.FROZEN);
                 checkingAccountRepository.save(checkingAccount);
+                LOGGER.error("Controlled exception - Freeze account " + senderAccount.getId() +  " due to possible fraud");
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
 
@@ -127,61 +136,35 @@ public class TransactionService {
             checkingAccountRepository.save(checkingAccount);
 
         } else if (senderAccount instanceof StudentAccount) {
-            // check ownership
-            if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
-                if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                    throw new IllegalTransactionException("Unable to access this account");
-                }
-            }
-
             StudentAccount studentAccount = (StudentAccount) senderAccount;
             if(studentAccount.getStatus().equals(Status.FROZEN)){
+                LOGGER.error("Controlled exception - Account " + senderAccount.getId() + " is frozen");
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
-            if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
-            }
 
+            // fraud detection
             if(checkFraud(studentAccount, newTransaction.getDate(), transaction.getAmount())){
                 studentAccount.setStatus(Status.FROZEN);
                 studentAccountRepository.save(studentAccount);
+                LOGGER.error("Controlled exception - Freeze account " + senderAccount.getId() +  " due to possible fraud");
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
+
             newTransaction.setSenderId(studentAccount);
-            senderAccount.getBalance().decreaseAmount(transaction.getAmount());
+            studentAccount.getBalance().decreaseAmount(transaction.getAmount());
             studentAccountRepository.save(studentAccount);
 
         } else if (senderAccount instanceof CreditCard) {
-            // check ownership
-            if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
-                if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-                    throw new IllegalTransactionException("Unable to access this account");
-                }
-            }
-
             CreditCard creditCard = (CreditCard) senderAccount;
-            if(creditCard.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
-                throw new IllegalInputException("Unable to make this transfer: insufficient funds");
-            }
             creditCard.applyMonthlyInterest();
             newTransaction.setSenderId(creditCard);
             creditCard.getBalance().decreaseAmount(transaction.getAmount());
             creditCardRepository.save(creditCard);
 
-        } else {
-            throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }
 
         // RECIPIENT
         if (recipientAccount instanceof SavingsAccount) {
-            // verify recipient's ownership
-            if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-                if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
-                    System.out.println("");
-                    throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
-                }
-            }
-
             SavingsAccount savingsAccount = (SavingsAccount) recipientAccount;
             newTransaction.setRecipientId(savingsAccount);
             savingsAccount.getBalance().increaseAmount(transaction.getAmount());
@@ -192,13 +175,6 @@ public class TransactionService {
             savingsAccountRepository.save(savingsAccount);
 
         } else if (recipientAccount instanceof CheckingAccount) {
-            // verify recipient's ownership
-            if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-                if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
-                    throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
-                }
-            }
-
             CheckingAccount checkingAccount = (CheckingAccount) recipientAccount;
             newTransaction.setRecipientId(checkingAccount);
             checkingAccount.getBalance().increaseAmount(transaction.getAmount());
@@ -208,34 +184,20 @@ public class TransactionService {
             checkingAccountRepository.save(checkingAccount);
 
         } else if(recipientAccount instanceof StudentAccount){
-            // verify recipient's ownership
-            if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-                if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
-                    throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
-                }
-            }
-
             StudentAccount studentAccount = (StudentAccount) recipientAccount;
             newTransaction.setRecipientId(studentAccount);
             studentAccount.getBalance().increaseAmount(transaction.getAmount());
             studentAccountRepository.save(studentAccount);
 
         } else if(recipientAccount instanceof CreditCard){
-            // verify recipient's ownership
-            if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-                if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
-                    throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
-                }
-            }
-
             CreditCard creditCard = (CreditCard) recipientAccount;
             newTransaction.setRecipientId(creditCard);
             creditCard.getBalance().increaseAmount(transaction.getAmount());
             creditCardRepository.save(creditCard);
-            
-        } else {
-            throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
+
         }
-        transactionRepository.save(newTransaction);
+
+        Transaction savedTransaction = transactionRepository.save(newTransaction);
+        LOGGER.info("Transaction successfully made and saved " + savedTransaction);
     }
 }

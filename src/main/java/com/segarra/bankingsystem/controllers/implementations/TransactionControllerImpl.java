@@ -2,7 +2,6 @@ package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.TransactionController;
 import com.segarra.bankingsystem.dto.TransactionRequest;
-import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.User;
 import com.segarra.bankingsystem.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,7 @@ public class TransactionControllerImpl implements TransactionController {
 
     @PostMapping("/transactions")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void makeTransaction(@RequestParam("recipient") String recipientType, @RequestParam("sender") String senderType,
-                                @Valid @RequestBody TransactionRequest transaction, @AuthenticationPrincipal User user) {
-        transactionService.makeTransaction(recipientType, senderType, transaction, user);
+    public void makeTransaction(@RequestBody @Valid TransactionRequest transaction, @AuthenticationPrincipal User user) {
+        transactionService.makeTransaction(transaction, user);
     }
 }

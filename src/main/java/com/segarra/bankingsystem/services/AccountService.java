@@ -69,7 +69,7 @@ public class AccountService {
     }
 
     // retrieve account by id from logged user - user restricted
-    @PreAuthorize("authenticated")
+    @Secured({"ROLE_ACCOUNTHOLDER"})
     public AccountVM getById(int id, User user){
         Account account = accountRepository.findUserAccountById(user.getId(), id);
 
@@ -246,7 +246,7 @@ public class AccountService {
     }
 
     // retrieve accounts from logged user - user restricted
-    @PreAuthorize("authenticated")
+    @Secured({"ROLE_ACCOUNTHOLDER"})
     public List<AccountVM> getAllUserAccounts(User user){
         List<Account> accounts = accountRepository.findAllUserAccounts(user.getId());
         LOGGER.info("GET request to retrieve every account from user " + user.getUsername());

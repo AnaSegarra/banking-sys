@@ -5,6 +5,8 @@ import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.exceptions.*;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,21 +28,27 @@ public class TransactionService {
     @Autowired
     private StudentAccountRepository studentAccountRepository;
     @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
     private TransactionRepository transactionRepository;
+
+    private static final Logger LOGGER = LogManager.getLogger(TransactionService.class);
+
 
     public boolean checkFraud(Account account, LocalDateTime date, BigDecimal transaction){
         BigDecimal highest = transactionRepository.findHighestDailyTransactionByCustomer(date, account);
         BigDecimal currentTotal = transactionRepository.findTodayTotalTransactions(date, account);
         LocalDateTime lastTransaction =  transactionRepository.findLastTransaction(account);
-        if(currentTotal == null || lastTransaction == null || highest == null){
-            return false;
-        }
-
         /* freeze account in case today's transactions add to more than 150% of the highest daily total
            transactions any other day
         */
-        if(highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
+        if(highest != null && highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
             return true;
+        }
+
+        // don't freeze account if is the first transaction ever
+        if(lastTransaction == null){
+            return false;
         }
 
         // freeze account if two transactions happened in less than a second
@@ -49,48 +57,49 @@ public class TransactionService {
         return seconds <= 10;
     }
 
-    @PreAuthorize("authenticated")
+    @Secured({"ROLE_ACCOUNTHOLDER"})
     @Transactional(dontRollbackOn = FrozenAccountException.class)
-    public void makeTransaction(String recipientType, String senderType, TransactionRequest transaction, User user){
+    public void makeTransaction(TransactionRequest transaction, User user){
         // throw error if accounts ids are the same
         if(transaction.getRecipientId() == transaction.getSenderId()){
             throw new IllegalInputException("Recipient account must be different from sender account");
         }
+        Account senderAccount = accountRepository.findById(transaction.getSenderId())
+                .orElseThrow(()-> new ResourceNotFoundException("Sender account with id " + transaction.getSenderId() + " not found"));
+        Account recipientAccount = accountRepository.findById(transaction.getRecipientId())
+                .orElseThrow(()-> new ResourceNotFoundException("Recipient account with id " + transaction.getRecipientId() + " not found"));
 
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
         // SENDER
-        if(senderType.equals("savings")){
-            SavingsAccount senderAccount = savingsAccountRepository.findById(transaction.getSenderId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
+        if (senderAccount instanceof SavingsAccount) {
             // check ownership
             if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
                 if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                    LOGGER.error("Controlled exception - " + user.getUsername() + " tried to access an account not owned by them");
                     throw new IllegalTransactionException("Unable to access this account"); // throws 403 Forbidden
                 }
             }
-
-            if(senderAccount.getStatus().equals(Status.FROZEN)){
+            SavingsAccount savingsAccount = (SavingsAccount) senderAccount;
+            if(savingsAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
-            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
-                senderAccount.setStatus(Status.FROZEN);
-                savingsAccountRepository.save(senderAccount);
+            if(checkFraud(savingsAccount, newTransaction.getDate(), transaction.getAmount())){
+                savingsAccount.setStatus(Status.FROZEN);
+                savingsAccountRepository.save(savingsAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
-            senderAccount.applyAnnualInterest();
-            newTransaction.setSenderId(senderAccount);
-            senderAccount.getBalance().decreaseAmount(transaction.getAmount());
-            senderAccount.applyPenaltyFee(senderAccount.getMinimumBalance());
-            savingsAccountRepository.save(senderAccount);
-        } else if(senderType.equals("checking")){
-            CheckingAccount senderAccount = checkingAccountRepository.findById(transaction.getSenderId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
+            savingsAccount.applyAnnualInterest();
+            newTransaction.setSenderId(savingsAccount);
+            savingsAccount.getBalance().decreaseAmount(transaction.getAmount());
+            savingsAccount.applyPenaltyFee(savingsAccount.getMinimumBalance());
+            savingsAccountRepository.save(savingsAccount);
 
+        } else if (senderAccount instanceof CheckingAccount) {
             // check ownership
             if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
                 if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
@@ -98,26 +107,26 @@ public class TransactionService {
                 }
             }
 
-            if(senderAccount.getStatus().equals(Status.FROZEN)){
+            CheckingAccount checkingAccount = (CheckingAccount) senderAccount;
+            if(checkingAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
-            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
-                senderAccount.setStatus(Status.FROZEN);
-                checkingAccountRepository.save(senderAccount);
+            if(checkFraud(checkingAccount, newTransaction.getDate(), transaction.getAmount())){
+                checkingAccount.setStatus(Status.FROZEN);
+                checkingAccountRepository.save(checkingAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
-            newTransaction.setSenderId(senderAccount);
-            senderAccount.getBalance().decreaseAmount(transaction.getAmount());
-            senderAccount.applyPenaltyFee(senderAccount.getMinimumBalance());
-            senderAccount.applyMonthlyMaintenanceFee();
-            checkingAccountRepository.save(senderAccount);
-        } else if(senderType.equals("student")){
-            StudentAccount senderAccount = studentAccountRepository.findById(transaction.getSenderId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
 
+            newTransaction.setSenderId(checkingAccount);
+            checkingAccount.getBalance().decreaseAmount(transaction.getAmount());
+            checkingAccount.applyPenaltyFee(checkingAccount.getMinimumBalance());
+            checkingAccount.applyMonthlyMaintenanceFee();
+            checkingAccountRepository.save(checkingAccount);
+
+        } else if (senderAccount instanceof StudentAccount) {
             // check ownership
             if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
                 if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
@@ -125,25 +134,24 @@ public class TransactionService {
                 }
             }
 
-            if(senderAccount.getStatus().equals(Status.FROZEN)){
+            StudentAccount studentAccount = (StudentAccount) senderAccount;
+            if(studentAccount.getStatus().equals(Status.FROZEN)){
                 throw new IllegalInputException("Unable to make this transaction: account with id " + senderAccount.getId() + " is frozen");
             }
             if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
 
-            if(checkFraud(senderAccount, newTransaction.getDate(), transaction.getAmount())){
-                senderAccount.setStatus(Status.FROZEN);
-                studentAccountRepository.save(senderAccount);
+            if(checkFraud(studentAccount, newTransaction.getDate(), transaction.getAmount())){
+                studentAccount.setStatus(Status.FROZEN);
+                studentAccountRepository.save(studentAccount);
                 throw new FrozenAccountException("Suspicious activity detected: the account has been frozen");
             };
-            newTransaction.setSenderId(senderAccount);
+            newTransaction.setSenderId(studentAccount);
             senderAccount.getBalance().decreaseAmount(transaction.getAmount());
-            studentAccountRepository.save(senderAccount);
-        } else if(senderType.equals("credit-card")){
-            CreditCard senderAccount = creditCardRepository.findById(transaction.getSenderId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getSenderId() + " not found"));
+            studentAccountRepository.save(studentAccount);
 
+        } else if (senderAccount instanceof CreditCard) {
             // check ownership
             if( !senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
                 if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
@@ -151,22 +159,21 @@ public class TransactionService {
                 }
             }
 
-            if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
+            CreditCard creditCard = (CreditCard) senderAccount;
+            if(creditCard.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){
                 throw new IllegalInputException("Unable to make this transfer: insufficient funds");
             }
-            senderAccount.applyMonthlyInterest();
-            newTransaction.setSenderId(senderAccount);
-            senderAccount.getBalance().decreaseAmount(transaction.getAmount());
-            creditCardRepository.save(senderAccount);
+            creditCard.applyMonthlyInterest();
+            newTransaction.setSenderId(creditCard);
+            creditCard.getBalance().decreaseAmount(transaction.getAmount());
+            creditCardRepository.save(creditCard);
+
         } else {
             throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }
 
         // RECIPIENT
-        if(recipientType.equals("savings")){
-            SavingsAccount recipientAccount = savingsAccountRepository.findById(transaction.getRecipientId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getRecipientId() + " not found"));
-
+        if (recipientAccount instanceof SavingsAccount) {
             // verify recipient's ownership
             if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
                 if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
@@ -175,17 +182,16 @@ public class TransactionService {
                 }
             }
 
-            newTransaction.setRecipientId(recipientAccount);
-            recipientAccount.getBalance().increaseAmount(transaction.getAmount());
-            if(recipientAccount.getBalance().getAmount().compareTo(recipientAccount.getMinimumBalance()) > 0){
+            SavingsAccount savingsAccount = (SavingsAccount) recipientAccount;
+            newTransaction.setRecipientId(savingsAccount);
+            savingsAccount.getBalance().increaseAmount(transaction.getAmount());
+            if(recipientAccount.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) > 0){
                 // reset penalty fee applied status if balance surpasses min balance
                 recipientAccount.setPenaltyFeeApplied(false);
             }
-            savingsAccountRepository.save(recipientAccount);
-        } else if (recipientType.equals("checking")){
-            CheckingAccount recipientAccount = checkingAccountRepository.findById(transaction.getRecipientId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getRecipientId() + " not found"));
+            savingsAccountRepository.save(savingsAccount);
 
+        } else if (recipientAccount instanceof CheckingAccount) {
             // verify recipient's ownership
             if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
                 if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
@@ -193,16 +199,15 @@ public class TransactionService {
                 }
             }
 
-            newTransaction.setRecipientId(recipientAccount);
-            recipientAccount.getBalance().increaseAmount(transaction.getAmount());
-            if(recipientAccount.getBalance().getAmount().compareTo(recipientAccount.getMinimumBalance()) > 0){
+            CheckingAccount checkingAccount = (CheckingAccount) recipientAccount;
+            newTransaction.setRecipientId(checkingAccount);
+            checkingAccount.getBalance().increaseAmount(transaction.getAmount());
+            if(checkingAccount.getBalance().getAmount().compareTo(checkingAccount.getMinimumBalance()) > 0){
                 recipientAccount.setPenaltyFeeApplied(false);
             }
-            checkingAccountRepository.save(recipientAccount);
-        } else if(recipientType.equals("student")){
-            StudentAccount recipientAccount = studentAccountRepository.findById(transaction.getRecipientId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getRecipientId() + " not found"));
+            checkingAccountRepository.save(checkingAccount);
 
+        } else if(recipientAccount instanceof StudentAccount){
             // verify recipient's ownership
             if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
                 if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
@@ -210,13 +215,12 @@ public class TransactionService {
                 }
             }
 
-            newTransaction.setRecipientId(recipientAccount);
-            recipientAccount.getBalance().increaseAmount(transaction.getAmount());
-            studentAccountRepository.save(recipientAccount);
-        } else if(recipientType.equals("credit-card")){
-            CreditCard recipientAccount = creditCardRepository.findById(transaction.getRecipientId())
-                    .orElseThrow(()-> new ResourceNotFoundException("Account with id " + transaction.getRecipientId() + " not found"));
+            StudentAccount studentAccount = (StudentAccount) recipientAccount;
+            newTransaction.setRecipientId(studentAccount);
+            studentAccount.getBalance().increaseAmount(transaction.getAmount());
+            studentAccountRepository.save(studentAccount);
 
+        } else if(recipientAccount instanceof CreditCard){
             // verify recipient's ownership
             if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
                 if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
@@ -224,9 +228,11 @@ public class TransactionService {
                 }
             }
 
-            newTransaction.setRecipientId(recipientAccount);
-            recipientAccount.getBalance().increaseAmount(transaction.getAmount());
-            creditCardRepository.save(recipientAccount);
+            CreditCard creditCard = (CreditCard) recipientAccount;
+            newTransaction.setRecipientId(creditCard);
+            creditCard.getBalance().increaseAmount(transaction.getAmount());
+            creditCardRepository.save(creditCard);
+            
         } else {
             throw new IllegalInputException("Must enter a valid account type of either savings, checking, student or credit-card");
         }

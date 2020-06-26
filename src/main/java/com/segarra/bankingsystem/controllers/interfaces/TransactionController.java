@@ -5,5 +5,5 @@ import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.User;
 
 public interface TransactionController {
-    void makeTransaction(String recipientType, String senderType, TransactionRequest transaction, User user);
+    void makeTransaction(TransactionRequest transaction, User user);
 }

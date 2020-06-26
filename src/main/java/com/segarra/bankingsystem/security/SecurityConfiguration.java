@@ -13,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled=true, prePostEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled=true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -36,8 +36,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         httpSecurity.httpBasic();
         httpSecurity.authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/v1/transactions").authenticated()
-                .antMatchers("/api/v1/users/accounts/**").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/v1/transactions").hasAuthority("ROLE_ACCOUNTHOLDER")
+                .antMatchers("/api/v1/users/accounts/**").hasAuthority("ROLE_ACCOUNTHOLDER")
                 .antMatchers("/api/v1/users").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/v1/accounts/**").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/api/v1/third-parties").hasAuthority("ROLE_ADMIN")

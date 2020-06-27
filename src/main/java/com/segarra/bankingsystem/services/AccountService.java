@@ -137,6 +137,10 @@ public class AccountService {
                 SavingsAccount savingsAccount = new SavingsAccount(primaryOwner, secondaryOwner,
                         newAccount.getBalance(), newAccount.getSavingsInterestRate(), newAccount.getSecretKey(),
                         newAccount.getSavingsMinimumBalance());
+                if(savingsAccount.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) < 0){
+                    LOGGER.error("Controlled exception - Requested account with balance smaller than minimum balance");
+                    throw new IllegalInputException("Account balance must be above minimum balance");
+                }
                 LOGGER.info("Savings account created");
                 return savingsAccountRepository.save(savingsAccount);
             case "checking":
@@ -157,6 +161,7 @@ public class AccountService {
                 LOGGER.info("Credit card created");
                 return creditCardRepository.save(creditCard);
         }
+        LOGGER.error("Controlled exception - Not valid account type requested upon creation");
         // throw error if account type doesn't exist
         throw new IllegalInputException("Must enter a valid account type of either savings, checking or credit-card");
     }

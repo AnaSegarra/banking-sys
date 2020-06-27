@@ -71,13 +71,22 @@ public class CreditCard extends Account {
         int months = Period.between(LocalDate.from(lastInterestApplied), LocalDate.now()).getMonths();
         if(months > 0){
             LOGGER.info("Apply " + months + " time(s) the monthly interestRate to credit card " + this.getId());
+            LOGGER.info("Previous balance: " + balance);
             for(int i = 0; i < months; i++){
                 BigDecimal interest = balance.getAmount()
-                        .multiply(interestRate.divide(new BigDecimal("12"),2, RoundingMode.HALF_EVEN));
+                        .multiply(interestRate.divide(new BigDecimal("12"),10, RoundingMode.HALF_EVEN));
                 LOGGER.info("Balance increased by " + interest);
                 balance.increaseAmount(interest);
             }
             lastInterestApplied = lastInterestApplied.plusMonths(months);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "CreditCard {" +
+                "id=" + id +
+                ", balance=" + balance +
+                '}';
     }
 }

@@ -7,11 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @DynamicUpdate
 @Table(name = "student_accounts")
 public class StudentAccount extends Account {
+    @NotNull(message = "Secret key required")
     protected int secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
@@ -46,4 +48,14 @@ public class StudentAccount extends Account {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "StudentAccount{" +
+                "id=" + id +
+                ", balance=" + balance +
+                ", status=" + status +
+                '}';
+    }
+
 }

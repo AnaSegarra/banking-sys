@@ -2,15 +2,21 @@ package com.segarra.bankingsystem.dto;
 
 import com.segarra.bankingsystem.models.Money;
 
+import javax.validation.Valid;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class AccountRequest {
+    @Min(value = 1, message = "A primary owner is required to create an account")
     private int primaryOwnerId;
     private int secondaryOwnerId;
+    @Valid
+    @NotNull(message = "Balance is required")
     private Money balance;
+    @NotNull(message = "Secret key required")
     private int secretKey;
     @NotNull(message = "Account type required: savings, checking or credit-card")
     private String accountType;

@@ -92,6 +92,7 @@ public class TransactionService {
 
         Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.getAmount());
+        LOGGER.info("Initialized transaction process of " + transaction.getAmount() + " from account " + transaction.getSenderId() + " to " + transaction.getRecipientId());
         // SENDER
         if (senderAccount instanceof SavingsAccount) {
             SavingsAccount savingsAccount = (SavingsAccount) senderAccount;
@@ -160,7 +161,6 @@ public class TransactionService {
             newTransaction.setSenderId(creditCard);
             creditCard.getBalance().decreaseAmount(transaction.getAmount());
             creditCardRepository.save(creditCard);
-
         }
 
         // RECIPIENT
@@ -194,7 +194,6 @@ public class TransactionService {
             newTransaction.setRecipientId(creditCard);
             creditCard.getBalance().increaseAmount(transaction.getAmount());
             creditCardRepository.save(creditCard);
-
         }
 
         Transaction savedTransaction = transactionRepository.save(newTransaction);

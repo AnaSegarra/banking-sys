@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class SavingsAccount extends Account {
     @DecimalMin(value = "0", message = "Interest rate shouldn't be a negative value")
     @Column(columnDefinition = "DECIMAL(5,4)")
     private BigDecimal interestRate;
+    @NotNull(message = "Secret key required")
     protected int secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
@@ -105,5 +107,14 @@ public class SavingsAccount extends Account {
             }
             lastInterestApplied = lastInterestApplied.plusYears(years);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "SavingsAccount {" +
+                "id=" + id +
+                ", balance=" + balance +
+                ", status=" + status +
+                '}';
     }
 }

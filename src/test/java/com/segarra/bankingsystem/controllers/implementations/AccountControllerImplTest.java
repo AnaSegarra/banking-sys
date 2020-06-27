@@ -294,7 +294,6 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a checking account with balance below minimum balance, expected 400 status code")
     void createCheckingAccount_InvalidBalance() throws Exception {
-        accountRequest.setAccountType("checking");
         accountRequest.setBalance(new Money(new BigDecimal("100")));
 
         mockMvc.perform(post("/api/v1/accounts")
@@ -307,8 +306,7 @@ class AccountControllerImplTest {
     @Test
     @DisplayName("Test post request to create a checking account without secret key, expected 400 status code")
     void createCheckingAccount_NoSecretKey() throws Exception {
-        accountRequest.setAccountType("checking");
-        accountRequest.setBalance(new Money(new BigDecimal("100")));
+        accountRequest.setSecretKey("");
 
         mockMvc.perform(post("/api/v1/accounts")
                 .with(user("admin").roles("ADMIN"))

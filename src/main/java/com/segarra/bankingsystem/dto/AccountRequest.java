@@ -1,5 +1,6 @@
 package com.segarra.bankingsystem.dto;
 
+import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.models.Money;
 
 import javax.validation.Valid;
@@ -16,7 +17,6 @@ public class AccountRequest {
     @Valid
     @NotNull(message = "Balance is required")
     private Money balance;
-    @Valid
     private String secretKey;
     @NotNull(message = "Account type required: savings, checking or credit-card")
     private String accountType;

@@ -132,9 +132,9 @@ public class AccountService {
                     .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getSecondaryOwnerId() + " not found"));
         }
 
-//        if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && newAccount.getSecretKey() == 0 ){
-//            throw new IllegalInputException("Secret key required");
-//        }
+        if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && (newAccount.getSecretKey() == null || !newAccount.getSecretKey().matches("\\d{4}")) ){
+            throw new IllegalInputException("Secret key required as a four length number");
+        }
 
         switch (newAccount.getAccountType()) {
             case "savings":

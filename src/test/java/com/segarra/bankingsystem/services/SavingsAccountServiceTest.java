@@ -42,9 +42,9 @@ class SavingsAccountServiceTest {
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
 
         SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,
-                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
+                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), "1234", new BigDecimal("200"));
         SavingsAccount savingsAccount2 = new SavingsAccount(accountHolder,
-                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), 1234, new BigDecimal("800"));
+                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), "1234", new BigDecimal("800"));
         savingsAccountList = Arrays.asList(savingsAccount, savingsAccount2);
     }
 

@@ -89,14 +89,14 @@ class AccountControllerImplTest {
         accountHolderRepository.saveAll(Stream.of( accountHolder2, youngAccHolder).collect(Collectors.toList()));
 
         checkingAccount = new CheckingAccount(accountHolder,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         checkingAccountRepository.save(checkingAccount);
 
         savingsAccount = new SavingsAccount(accountHolder,
-                new Money(new BigDecimal("1000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
+                new Money(new BigDecimal("1000")), new BigDecimal("0.15"), "1234", new BigDecimal("200"));
         savingsAccountRepository.save(savingsAccount);
 
-        studentAccount = new StudentAccount(accountHolder, new Money(new BigDecimal("3000")), 1234);
+        studentAccount = new StudentAccount(accountHolder, new Money(new BigDecimal("3000")), "1234");
         studentAccountRepository.save(studentAccount);
 
         creditCard = new CreditCard(accountHolder, new Money(new BigDecimal("4000")), new BigDecimal("200"), new BigDecimal("0.12"));
@@ -104,7 +104,7 @@ class AccountControllerImplTest {
 
         accountRequest = new AccountRequest();
         accountRequest.setPrimaryOwnerId(accountHolder.getId());
-        accountRequest.setSecretKey(1234);
+        accountRequest.setSecretKey("1234");
         accountRequest.setBalance(new Money(new BigDecimal("12000")));
         accountRequest.setAccountType("checking");
 
@@ -112,9 +112,9 @@ class AccountControllerImplTest {
         // ==== request objects
         debitRequest = new FinanceAdminRequest(new BigDecimal("100"), "debit");
         creditRequest = new FinanceAdminRequest(new BigDecimal("200"), "credit");
-        thirdPartyDebitRequest = new FinanceThirdPartyRequest(new BigDecimal("100"), "debit", 1234);
-        thirdPartyCreditRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", 1234);
-        thirdPartyInvalidRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", 3214);
+        thirdPartyDebitRequest = new FinanceThirdPartyRequest(new BigDecimal("100"), "debit", "1234");
+        thirdPartyCreditRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", "1234");
+        thirdPartyInvalidRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", "3214");
 
     }
 
@@ -283,6 +283,32 @@ class AccountControllerImplTest {
     void createSavingsAccount_InvalidBalance() throws Exception {
         accountRequest.setAccountType("savings");
         accountRequest.setBalance(new Money(new BigDecimal("800")));
+
+        mockMvc.perform(post("/api/v1/accounts")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test post request to create a checking account with balance below minimum balance, expected 400 status code")
+    void createCheckingAccount_InvalidBalance() throws Exception {
+        accountRequest.setAccountType("checking");
+        accountRequest.setBalance(new Money(new BigDecimal("100")));
+
+        mockMvc.perform(post("/api/v1/accounts")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test post request to create a checking account without secret key, expected 400 status code")
+    void createCheckingAccount_NoSecretKey() throws Exception {
+        accountRequest.setAccountType("checking");
+        accountRequest.setBalance(new Money(new BigDecimal("100")));
 
         mockMvc.perform(post("/api/v1/accounts")
                 .with(user("admin").roles("ADMIN"))

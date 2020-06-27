@@ -10,12 +10,12 @@ public class FinanceThirdPartyRequest {
     @NotNull(message = "Operation type required: debit or credit")
     private String operation;
     @NotNull(message = "Account secret key is required")
-    private int secretKey;
+    private String secretKey;
 
     public FinanceThirdPartyRequest() {
     }
 
-    public FinanceThirdPartyRequest(BigDecimal amount, String operation, int secretKey) {
+    public FinanceThirdPartyRequest(BigDecimal amount, String operation, String secretKey) {
         this.amount = amount;
         this.operation = operation;
         this.secretKey = secretKey;
@@ -37,11 +37,11 @@ public class FinanceThirdPartyRequest {
         this.operation = operation;
     }
 
-    public int getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
-    public void setSecretKey(int secretKey) {
+    public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 }

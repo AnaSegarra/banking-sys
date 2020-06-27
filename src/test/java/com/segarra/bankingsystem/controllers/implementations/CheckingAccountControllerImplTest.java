@@ -55,9 +55,9 @@ class CheckingAccountControllerImplTest {
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2, youngAccHolder).collect(Collectors.toList()));
 
         CheckingAccount checkingAccount = new CheckingAccount(accountHolder2,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         CheckingAccount checkingAccount2 = new CheckingAccount(accountHolder2,
-                new Money(new BigDecimal("5000")), 1234);
+                new Money(new BigDecimal("5000")), "1234");
 
         checkingAccountRepository.saveAll(Stream.of(checkingAccount, checkingAccount2).collect(Collectors.toList()));
     }

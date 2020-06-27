@@ -132,9 +132,9 @@ public class AccountService {
                     .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getSecondaryOwnerId() + " not found"));
         }
 
-        if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && newAccount.getSecretKey() == 0 ){
-            throw new IllegalInputException("Secret key required");
-        }
+//        if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && newAccount.getSecretKey() == 0 ){
+//            throw new IllegalInputException("Secret key required");
+//        }
 
         switch (newAccount.getAccountType()) {
             case "savings":
@@ -269,7 +269,7 @@ public class AccountService {
 
         if (account instanceof CheckingAccount) {
             CheckingAccount checkingAccount = (CheckingAccount) account;
-            if(checkingAccount.getSecretKey() != financeThirdPartyRequestRequest.getSecretKey()){
+            if(!checkingAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
 
@@ -280,7 +280,7 @@ public class AccountService {
 
         } else if (account instanceof SavingsAccount) {
             SavingsAccount savingsAccount = (SavingsAccount) account;
-            if(savingsAccount.getSecretKey() != financeThirdPartyRequestRequest.getSecretKey()){
+            if(!savingsAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
 
@@ -294,7 +294,7 @@ public class AccountService {
             throw new IllegalTransactionException("Unable to access this account");
         } else if (account instanceof StudentAccount) {
             StudentAccount studentAccount = (StudentAccount) account;
-            if(studentAccount.getSecretKey() != financeThirdPartyRequestRequest.getSecretKey()){
+            if(!studentAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
             applyFinance(studentAccount, financeThirdPartyRequestRequest.getOperation().toLowerCase(), financeThirdPartyRequestRequest.getAmount());

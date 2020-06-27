@@ -1,6 +1,5 @@
 package com.segarra.bankingsystem.dto;
 
-import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.models.Money;
 
 import javax.validation.Valid;
@@ -17,8 +16,8 @@ public class AccountRequest {
     @Valid
     @NotNull(message = "Balance is required")
     private Money balance;
-    @NotNull(message = "Secret key required")
-    private int secretKey;
+    @Valid
+    private String secretKey;
     @NotNull(message = "Account type required: savings, checking or credit-card")
     private String accountType;
     @DecimalMax(value = "0.5", message = "Interest rate must be below 0.5")
@@ -38,7 +37,7 @@ public class AccountRequest {
     public AccountRequest() {
     }
 
-    public AccountRequest(int primaryOwnerId, int secondaryOwnerId, Money balance, int secretKey,
+    public AccountRequest(int primaryOwnerId, int secondaryOwnerId, Money balance, String secretKey,
                           BigDecimal savingsInterestRate, BigDecimal savingsMinimumBalance,
                           BigDecimal creditCardLimit, BigDecimal cardInterestRate, String accountType) {
         this.primaryOwnerId = primaryOwnerId;
@@ -76,11 +75,11 @@ public class AccountRequest {
         this.balance = balance;
     }
 
-    public int getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
-    public void setSecretKey(int secretKey) {
+    public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 

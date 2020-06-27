@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ public class SavingsAccount extends Account {
     @Column(columnDefinition = "DECIMAL(5,4)")
     private BigDecimal interestRate;
     @NotNull(message = "Secret key required")
-    protected int secretKey;
+    protected String secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
     @DecimalMax(value = "1000", message = "Minimum balance must be below 1000")
@@ -37,7 +38,7 @@ public class SavingsAccount extends Account {
     }
 
     public SavingsAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance,
-                          BigDecimal interestRate, int secretKey, BigDecimal minimumBalance) {
+                          BigDecimal interestRate, String secretKey, BigDecimal minimumBalance) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         setInterestRate(interestRate);
@@ -46,7 +47,7 @@ public class SavingsAccount extends Account {
         this.lastInterestApplied = LocalDateTime.now();
     }
 
-    public SavingsAccount(AccountHolder primaryOwner, Money balance, BigDecimal interestRate, int secretKey,
+    public SavingsAccount(AccountHolder primaryOwner, Money balance, BigDecimal interestRate, String secretKey,
                           BigDecimal minimumBalance) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
@@ -64,11 +65,11 @@ public class SavingsAccount extends Account {
         this.interestRate = interestRate == null ? new BigDecimal("0.0025") : interestRate;
     }
 
-    public int getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
-    public void setSecretKey(int secretKey) {
+    public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 

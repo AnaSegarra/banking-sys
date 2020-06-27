@@ -46,9 +46,9 @@ class CheckingAccountServiceTest {
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
 
         CheckingAccount checkingAccount = new CheckingAccount(accountHolder2,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         CheckingAccount checkingAccount2 = new CheckingAccount(accountHolder2,
-                new Money(new BigDecimal("5000")), 1234);
+                new Money(new BigDecimal("5000")), "1234");
         checkingAccountList = Arrays.asList(checkingAccount, checkingAccount2);
     }
 

@@ -47,9 +47,9 @@ class StudentAccountControllerImplTest {
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         StudentAccount studentAccount2 = new StudentAccount(accountHolder2,
-                new Money(new BigDecimal("5000")), 1234);
+                new Money(new BigDecimal("5000")), "1234");
 
         studentAccountRepository.saveAll(Stream.of(studentAccount, studentAccount2).collect(Collectors.toList()));
     }

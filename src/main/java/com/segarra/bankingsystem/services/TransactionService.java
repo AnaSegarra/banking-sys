@@ -41,6 +41,7 @@ public class TransactionService {
            transactions any other day
         */
         if(highest != null && currentTotal != null && highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
+            LOGGER.error("Controlled exception - Transactions made today have surpassed more than 150% of the total made any other day");
             return true;
         }
 
@@ -51,6 +52,9 @@ public class TransactionService {
 
         // freeze account if two transactions happened in less than a second
         int seconds = (int) lastTransaction.until(date, ChronoUnit.SECONDS);
+        if(seconds <= 1){
+            LOGGER.error("Controlled exception - More than 2 transactions occurred within a one second period");
+        }
         // set to one after testing
         return seconds <= 1;
     }
@@ -63,6 +67,7 @@ public class TransactionService {
             LOGGER.error("Controlled exception - Recipient and sender accounts are the same");
             throw new IllegalInputException("Recipient account must be different from sender account");
         }
+
         Account senderAccount = accountRepository.findById(transaction.getSenderId())
                 .orElseThrow(()-> new ResourceNotFoundException("Sender account with id " + transaction.getSenderId() + " not found"));
         Account recipientAccount = accountRepository.findById(transaction.getRecipientId())

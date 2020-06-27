@@ -40,9 +40,9 @@ class StudentAccountServiceTest {
                 new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "ana_s");
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         StudentAccount studentAccount2 = new StudentAccount(accountHolder2,
-                new Money(new BigDecimal("5000")), 1234);
+                new Money(new BigDecimal("5000")), "1234");
         studentAccountList = Arrays.asList(studentAccount, studentAccount2);
     }
 

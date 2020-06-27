@@ -55,7 +55,7 @@ class AccountHolderServiceTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("Unit test - signup of new account holder")
+    @DisplayName("Unit test - create new account holder")
     void create() {
         AccountHolder accountHolder = new AccountHolder("Sergio", LocalDate.of(2020, 1, 28),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28700"), "1234", "gabi_c");

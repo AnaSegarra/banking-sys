@@ -1,5 +1,6 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segarra.bankingsystem.dto.TransactionRequest;
 import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.models.*;
@@ -18,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -54,6 +57,7 @@ class TransactionControllerImplTest {
     private PasswordEncoder passwordEncoder;
 
     private MockMvc mockMvc;
+    private AccountHolder accountHolder;
     private CheckingAccount checkingAccount;
     private CheckingAccount checkingAccount2;
     private SavingsAccount savingsAccount;
@@ -62,12 +66,13 @@ class TransactionControllerImplTest {
     private StudentAccount studentAccount2;
     private CreditCard creditCard;
     private CreditCard creditCard2;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
 
-        AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
+        accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
@@ -116,9 +121,10 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test successful transaction between checking accounts, expected 204 status code")
     void makeTransaction_CheckingAccounts() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), checkingAccount.getId(), new BigDecimal("200"));
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -131,9 +137,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test successful transaction between savings accounts, expected 204 status code")
     void makeTransaction_SavingsAccounts() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", savingsAccount2.getId(), savingsAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ savingsAccount2.getId() + ", \"senderId\":" + savingsAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -146,9 +154,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test successful transaction between student accounts, expected reduced balance and 204 status code")
     void makeTransaction_StudentAccounts() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", studentAccount2.getId(), studentAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ studentAccount2.getId() + ", \"senderId\":" + studentAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -161,9 +171,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test successful transaction between credit cards, expected reduced balance and 204 status code")
     void makeTransaction_CreditCards() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", creditCard2.getId(), creditCard.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ creditCard2.getId() + ", \"senderId\":" + creditCard.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -178,9 +190,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction between accounts with the same id, expected 400 status code ")
     void makeTransaction_SameAccount() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount.getId(), checkingAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -188,9 +202,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from checking account not owned by logged user, expected 403 status code")
     void makeTransaction_CheckingAccount_Forbidden() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", savingsAccount2.getId(), checkingAccount2.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ savingsAccount2.getId() + ", \"senderId\":" + checkingAccount2.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -198,9 +214,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from savings account not owned by recipient's name, expected 400 status code")
     void makeTransaction_SavingsAccount_Forbidden() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gabi", checkingAccount2.getId(), savingsAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gabi\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + savingsAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -210,9 +228,11 @@ class TransactionControllerImplTest {
     void makeTransaction_CheckingAccountFrozen_BadRequest() throws Exception {
         checkingAccount.setStatus(Status.FROZEN);
         checkingAccountRepository.save(checkingAccount);
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), checkingAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -222,9 +242,11 @@ class TransactionControllerImplTest {
     void makeTransaction_SavingsAccountFrozen_BadRequest() throws Exception {
         savingsAccount.setStatus(Status.FROZEN);
         savingsAccountRepository.save(savingsAccount);
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), savingsAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + savingsAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -234,9 +256,11 @@ class TransactionControllerImplTest {
     void makeTransaction_StudentAccountFrozen_BadRequest() throws Exception {
         studentAccount.setStatus(Status.FROZEN);
         studentAccountRepository.save(studentAccount);
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), studentAccount.getId(), new BigDecimal("200"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + studentAccount.getId() + ", \"amount\": 200}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -244,9 +268,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from checking account with not enough funds, expected 400 status code")
     void makeTransaction_CheckingAccountNoFunds_BadRequest() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), checkingAccount.getId(), new BigDecimal("2500"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + checkingAccount.getId() + ", \"amount\": 2500}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -254,9 +280,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from savings account with not enough funds, expected 400 status code")
     void makeTransaction_SavingsAccountNoFunds_BadRequest() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), savingsAccount.getId(), new BigDecimal("1500"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + savingsAccount.getId() + ", \"amount\": 1500}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -264,9 +292,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from student account with not enough funds, expected 400 status code")
     void makeTransaction_StudentAccountNoFunds_BadRequest() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), studentAccount.getId(), new BigDecimal("3100"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + studentAccount.getId() + ", \"amount\": 3100}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -274,9 +304,11 @@ class TransactionControllerImplTest {
     @Test
     @DisplayName("Test transaction from credit card with not enough funds, expected 400 status code")
     void makeTransaction_CreditCardNoFunds_BadRequest() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), creditCard.getId(), new BigDecimal("4100"));
+
         mockMvc.perform(post("/api/v1/transactions")
                 .with(httpBasic("ana_s", "1234"))
-                .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + creditCard.getId() + ", \"amount\": 4100}")
+                .content(objectMapper.writeValueAsString(transaction))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -319,5 +351,79 @@ class TransactionControllerImplTest {
                 .content("{\"recipientName\": \"Gema\", \"recipientId\":"+ checkingAccount2.getId() + ", \"senderId\":" + studentAccount.getId() + ", \"amount\": 100}")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+
+    // Test transactions with fees applied
+    @Test
+    @DisplayName("Test transaction from savings account that drops below minimum balance so penalty fee is applied")
+    void makeTransaction_ApplyPenaltyFee() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), savingsAccount.getId(), new BigDecimal("900"));
+
+        MvcResult result = mockMvc.perform(post("/api/v1/transactions")
+                    .with(httpBasic("ana_s", "1234"))
+                    .content(objectMapper.writeValueAsString(transaction))
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNoContent()).andReturn();
+
+        assertEquals( new BigDecimal("60.00"), savingsAccountRepository.findById(savingsAccount.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test monthly maintenance fee being applied to checking account during transaction")
+    void makeTransaction_ApplyMonthlyMaintenanceFee() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), checkingAccount.getId(), new BigDecimal("100"));
+        checkingAccount.setLastFeeApplied(checkingAccount.getLastFeeApplied().minusMonths(2));
+        checkingAccountRepository.save(checkingAccount);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/transactions")
+                .with(httpBasic("ana_s", "1234"))
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent()).andReturn();
+
+        /* monthly maintenance fee of 12 applied two times (24) and minus 100 from transaction
+           with a starting balance of 2000 results in 1876
+         */
+        assertEquals( new BigDecimal("1876.00"), checkingAccountRepository.findById(checkingAccount.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test monthly interest rate being applied to credit card during transaction")
+    void makeTransaction_ApplyMonthlyInterest() throws Exception {
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), creditCard.getId(), new BigDecimal("100"));
+        creditCard.setLastInterestApplied(creditCard.getLastInterestApplied().minusMonths(2));
+        creditCardRepository.save(creditCard);
+
+        mockMvc.perform(post("/api/v1/transactions")
+                .with(httpBasic("ana_s", "1234"))
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        /* monthly interest rate of 0.12 (0.01 per month) applied two times increases a starting
+            balance of 4000 to 4080.4 and minus 100 from transaction results in 3980.4
+        */
+        assertEquals( new BigDecimal("3980.40"), creditCardRepository.findById(creditCard.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test annual interest rate being applied to savings account during transaction")
+    void makeTransaction_ApplyAnnualInterest() throws Exception {
+        SavingsAccount newSavings = new SavingsAccount(accountHolder, new Money(new BigDecimal("1000000")), new BigDecimal("0.01"), "1234", new BigDecimal("200"));
+        newSavings.setLastInterestApplied(newSavings.getLastInterestApplied().minusYears(1));
+        savingsAccountRepository.save(newSavings);
+        TransactionRequest transaction = new TransactionRequest("Gema", checkingAccount2.getId(), newSavings.getId(), new BigDecimal("1500"));
+
+        mockMvc.perform(post("/api/v1/transactions")
+                .with(httpBasic("ana_s", "1234"))
+                .content(objectMapper.writeValueAsString(transaction))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        /* annual interest rate of 0.01 applied increases a starting balance of 1M to 1.010.000
+            and minus 1500 from transaction results in 1.008.500
+        */
+        assertEquals( new BigDecimal("1008500.00"), savingsAccountRepository.findById(newSavings.getId()).get().getBalance().getAmount());
     }
 }

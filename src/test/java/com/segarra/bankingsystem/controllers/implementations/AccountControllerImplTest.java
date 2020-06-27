@@ -115,7 +115,6 @@ class AccountControllerImplTest {
         thirdPartyDebitRequest = new FinanceThirdPartyRequest(new BigDecimal("100"), "debit", "1234");
         thirdPartyCreditRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", "1234");
         thirdPartyInvalidRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", "3214");
-
     }
 
     @AfterEach

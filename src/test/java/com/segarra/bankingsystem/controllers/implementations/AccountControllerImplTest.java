@@ -3,6 +3,7 @@ package com.segarra.bankingsystem.controllers.implementations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segarra.bankingsystem.dto.AccountRequest;
 import com.segarra.bankingsystem.dto.FinanceAdminRequest;
+import com.segarra.bankingsystem.dto.FinanceThirdPartyRequest;
 import com.segarra.bankingsystem.enums.Status;
 import com.segarra.bankingsystem.models.*;
 import com.segarra.bankingsystem.repositories.*;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -43,7 +46,11 @@ class AccountControllerImplTest {
     private CreditCardRepository creditCardRepository;
     @Autowired
     private AccountHolderRepository accountHolderRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private WebApplicationContext wac;
 
@@ -58,6 +65,10 @@ class AccountControllerImplTest {
     private AccountRequest accountRequest;
     private FinanceAdminRequest debitRequest;
     private FinanceAdminRequest creditRequest;
+    private FinanceThirdPartyRequest thirdPartyDebitRequest;
+    private FinanceThirdPartyRequest thirdPartyCreditRequest;
+    private FinanceThirdPartyRequest thirdPartyInvalidRequest;
+
 
     @BeforeEach
     void setUp() {
@@ -69,7 +80,13 @@ class AccountControllerImplTest {
                 new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
         youngAccHolder = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
                 new Address("Spain", "Madrid", "Luna Avenue", 8, "28200"), "1234", "gabi_c");
-        accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2, youngAccHolder).collect(Collectors.toList()));
+
+        accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword())); // encode user's password
+        accountHolderRepository.save(accountHolder);
+        Role role = new Role("ROLE_ACCOUNTHOLDER", accountHolder);
+        roleRepository.save(role);
+
+        accountHolderRepository.saveAll(Stream.of( accountHolder2, youngAccHolder).collect(Collectors.toList()));
 
         checkingAccount = new CheckingAccount(accountHolder,
                 new Money(new BigDecimal("2000")), 1234);
@@ -95,6 +112,10 @@ class AccountControllerImplTest {
         // ==== request objects
         debitRequest = new FinanceAdminRequest(new BigDecimal("100"), "debit");
         creditRequest = new FinanceAdminRequest(new BigDecimal("200"), "credit");
+        thirdPartyDebitRequest = new FinanceThirdPartyRequest(new BigDecimal("100"), "debit", 1234);
+        thirdPartyCreditRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", 1234);
+        thirdPartyInvalidRequest = new FinanceThirdPartyRequest(new BigDecimal("200"), "credit", 3214);
+
     }
 
     @AfterEach
@@ -431,15 +452,146 @@ class AccountControllerImplTest {
     }
 
 
+    /* ACCOUNT HOLDER - get all user accounts */
     @Test
-    void getAllUserAccounts() {
+    @DisplayName("Test get request to retrieve every account from logged user")
+    void getAllUserAccounts() throws Exception {
+        mockMvc.perform(get("/api/v1/users/accounts")
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void getById() {
+    @DisplayName("Test get by id of a checking account from logged user")
+    void getById_UserCheckingAccount() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/v1/users/accounts/" + checkingAccount.getId())
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Ana"));
+        assertTrue(result.getResponse().getContentAsString().contains("Checking account"));
     }
 
     @Test
-    void financeAccount() {
+    @DisplayName("Test get by id of a student account from logged user")
+    void getById_UserStudentAccount() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/v1/users/accounts/" + studentAccount.getId())
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Ana"));
+        assertTrue(result.getResponse().getContentAsString().contains("Student account"));
+    }
+
+    @Test
+    @DisplayName("Test get by id of a savings account from logged user")
+    void getById_UserSavingsAccount() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/v1/users/accounts/" + savingsAccount.getId())
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Ana"));
+        assertTrue(result.getResponse().getContentAsString().contains("Savings account"));
+    }
+
+    @Test
+    @DisplayName("Test get by id of a credit card from logged user")
+    void getById_UserCreditCard() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/v1/users/accounts/" + creditCard.getId())
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().contains("Ana"));
+        assertTrue(result.getResponse().getContentAsString().contains("Credit card"));
+    }
+
+    @Test
+    @DisplayName("Test get by id with an invalid account id when logged user, expected 400 status code")
+    void getById_InvalidId_LoggedUser() throws Exception {
+        mockMvc.perform(get("/api/v1/users/accounts/20")
+                .with(httpBasic("ana_s", "1234")))
+                .andExpect(status().isBadRequest());
+    }
+
+    /* TEST THIRD PARTY USERS DEBIT & CREDIT ACTIONS */
+    @Test
+    @DisplayName("Test debit checking account by a third party, expected reduced balance")
+    void financeAccount_DebitCheckingAccount_ThirdParty() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + checkingAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyDebitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("1900.00"), checkingAccountRepository.findById(checkingAccount.getId()).get().getBalance().getAmount());
+    }
+
+    @Test
+    @DisplayName("Test credit savings account by a third party, expected increased balance")
+    void financeAccount_CreditSavingsAccount_ThirdParty() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + savingsAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyCreditRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("1200.00"), savingsAccountRepository.findById(savingsAccount.getId()).get().getBalance().getAmount());
+    }
+
+
+    @Test
+    @DisplayName("Test debit student account by a third party, expected reduced balance")
+    void financeAccount_DebitStudentAccount_ThirdParty() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + studentAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyDebitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNoContent());
+
+        assertEquals( new BigDecimal("2900.00"), studentAccountRepository.findById(studentAccount.getId()).get().getBalance().getAmount());
+    }
+
+    // invalid debit/credit requests
+    @Test
+    @DisplayName("Test debit/credit an account that doesn't exist by a third party, expected expected 400 status code")
+    void financeAccount_InvalidAccountId_ThirdParty() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/20")
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyDebitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+    }
+    @Test
+    @DisplayName("Test debit credit card by a third party, expected 403 status code")
+    void financeAccount_DebitCreditCard_ThirdParty() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + creditCard.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyDebitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Test debit checking account by a third party with invalid secret key, expected 400 status code")
+    void financeAccount_DebitCheckingAccount_InvalidSecretKey() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + checkingAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyInvalidRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @DisplayName("Test debit savings account by a third party with invalid secret key, expected 400 status code")
+    void financeAccount_CreditSavingsAccount_InvalidSecretKey() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + savingsAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyInvalidRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test debit student account by a third party with invalid secret key, expected 400 status code")
+    void financeAccount_DebitStudentAccount_InvalidSecretKey() throws Exception {
+        mockMvc.perform(post("/api/v1/third-parties/accounts/" + studentAccount.getId())
+                .with(user("company").roles("THIRDPARTY"))
+                .content(objectMapper.writeValueAsString(thirdPartyInvalidRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
     }
 }

@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AccountService {
@@ -306,10 +307,22 @@ public class AccountService {
     @Secured({"ROLE_ACCOUNTHOLDER"})
     public List<AccountVM> getAllUserAccounts(User user){
         List<Account> accounts = accountRepository.findAllUserAccounts(user.getId());
+        Stream<AccountVM> checkingAccounts = accounts.stream().filter(account -> account.getClass().getSimpleName().equals("CheckingAccount"))
+                .map(account -> new AccountVM(account.getId(), account.getBalance(), "Checking account", account.getPrimaryOwner().getName(),
+                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((CheckingAccount) account).getStatus().toString()));
+        Stream<AccountVM> savingsAccounts = accounts.stream().filter(account -> account.getClass().getSimpleName().equals("SavingsAccount"))
+                .map(account -> new AccountVM(account.getId(), account.getBalance(), "Savings account", account.getPrimaryOwner().getName(),
+                        account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((SavingsAccount) account).getStatus().toString()));
+        Stream<AccountVM> studentAccounts = accounts.stream().filter(account -> account.getClass().getSimpleName().equals("StudentAccount"))
+                .map(account -> new AccountVM(account.getId(), account.getBalance(), "Student account", account.getPrimaryOwner().getName(),
+                        account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", ((StudentAccount) account).getStatus().toString()));
+        Stream<AccountVM> creditCards = accounts.stream().filter(account -> account.getClass().getSimpleName().equals("CreditCard"))
+                .map(account -> new AccountVM(account.getId(), account.getBalance(), "Credit card", account.getPrimaryOwner().getName(),
+                        account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", "NONE"));
+
+
         LOGGER.info("GET request to retrieve every account from user " + user.getUsername());
-        return accounts.stream().map(account -> new AccountVM(account.getId(), account.getBalance(),
-                account.getClass().getSimpleName(), account.getPrimaryOwner().getName(),
-                account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned"))
+        return Stream.of(checkingAccounts, savingsAccounts, studentAccounts, creditCards).flatMap(i -> i)
                 .collect(Collectors.toList());
     }
 }

@@ -42,7 +42,7 @@ public class AccountHolderService {
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());
         if(foundUser != null){
             LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
-            throw new IllegalInputException("Username" + accountHolder.getUsername() + "is already taken");
+            throw new IllegalInputException("Username " + accountHolder.getUsername() + " is already taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));

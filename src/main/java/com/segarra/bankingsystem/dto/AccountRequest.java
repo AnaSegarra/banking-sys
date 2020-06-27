@@ -37,20 +37,6 @@ public class AccountRequest {
     public AccountRequest() {
     }
 
-    public AccountRequest(int primaryOwnerId, int secondaryOwnerId, Money balance, String secretKey,
-                          BigDecimal savingsInterestRate, BigDecimal savingsMinimumBalance,
-                          BigDecimal creditCardLimit, BigDecimal cardInterestRate, String accountType) {
-        this.primaryOwnerId = primaryOwnerId;
-        this.secondaryOwnerId = secondaryOwnerId;
-        this.balance = balance;
-        this.secretKey = secretKey;
-        this.savingsInterestRate = savingsInterestRate;
-        this.savingsMinimumBalance = savingsMinimumBalance;
-        this.creditCardLimit = creditCardLimit;
-        this.cardInterestRate = cardInterestRate;
-        this.accountType = accountType;
-    }
-
     public int getPrimaryOwnerId() {
         return primaryOwnerId;
     }

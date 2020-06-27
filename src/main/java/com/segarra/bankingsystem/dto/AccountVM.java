@@ -13,14 +13,6 @@ public class AccountVM {
     public AccountVM() {
     }
 
-    public AccountVM(int id, Money balance, String className, String primaryOwner, String secondaryOwner) {
-        this.id = id;
-        this.balance = balance;
-        this.primaryOwner = primaryOwner;
-        this.secondaryOwner = secondaryOwner;
-        setAccountType(className);
-    }
-
     public AccountVM(int id, Money balance, String accountType, String primaryOwner, String secondaryOwner, String status) {
         this.id = id;
         this.balance = balance;

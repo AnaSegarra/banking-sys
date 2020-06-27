@@ -1,9 +1,7 @@
 package com.segarra.bankingsystem.models;
 
 import javax.persistence.Embeddable;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 
 @Embeddable
 public class Address {
@@ -17,6 +15,7 @@ public class Address {
     @Min(1)
     private int number;
     @NotBlank(message = "Zip code is required")
+    @Pattern(regexp="(\\d{5})", message = "Zip code must be numerical")
     private String zipCode;
 
     public Address() {

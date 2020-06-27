@@ -1,5 +1,6 @@
 package com.segarra.bankingsystem.dto;
 
+import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.models.Money;
 
 import javax.validation.Valid;

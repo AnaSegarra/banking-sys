@@ -132,15 +132,22 @@ public class AccountService {
                     .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getSecondaryOwnerId() + " not found"));
         }
 
+        if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && newAccount.getSecretKey() == 0 ){
+            throw new IllegalInputException("Secret key required");
+        }
+
         switch (newAccount.getAccountType()) {
             case "savings":
                 SavingsAccount savingsAccount = new SavingsAccount(primaryOwner, secondaryOwner,
                         newAccount.getBalance(), newAccount.getSavingsInterestRate(), newAccount.getSecretKey(),
                         newAccount.getSavingsMinimumBalance());
+
+                // prevent creation of account with starting balance under the minimum balance
                 if(savingsAccount.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) < 0){
                     LOGGER.error("Controlled exception - Requested account with balance smaller than minimum balance");
                     throw new IllegalInputException("Account balance must be above minimum balance");
                 }
+
                 LOGGER.info("Savings account created");
                 return savingsAccountRepository.save(savingsAccount);
             case "checking":
@@ -153,6 +160,12 @@ public class AccountService {
                 }
                 CheckingAccount checkingAccount = new CheckingAccount(primaryOwner, secondaryOwner, newAccount.getBalance(),
                         newAccount.getSecretKey());
+
+                // prevent creation of account with starting balance under the minimum balance
+                if(checkingAccount.getBalance().getAmount().compareTo(checkingAccount.getMinimumBalance()) < 0){
+                    LOGGER.error("Controlled exception - Requested account with balance smaller than minimum balance");
+                    throw new IllegalInputException("Account balance must be above minimum balance");
+                }
                 LOGGER.info("Checking account created");
                 return checkingAccountRepository.save(checkingAccount);
             case "credit-card":

@@ -40,7 +40,7 @@ public class TransactionService {
         /* freeze account in case today's transactions add to more than 150% of the highest daily total
            transactions any other day
         */
-        if(highest != null && highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
+        if(highest != null && currentTotal != null && highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
             return true;
         }
 
@@ -52,7 +52,7 @@ public class TransactionService {
         // freeze account if two transactions happened in less than a second
         int seconds = (int) lastTransaction.until(date, ChronoUnit.SECONDS);
         // set to one after testing
-        return seconds <= 10;
+        return seconds <= 1;
     }
 
     @Secured({"ROLE_ACCOUNTHOLDER"})

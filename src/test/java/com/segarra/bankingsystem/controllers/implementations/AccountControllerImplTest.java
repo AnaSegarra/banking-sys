@@ -278,6 +278,18 @@ class AccountControllerImplTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("Test post request to create a savings account with balance below minimum balance, expected 400 status code")
+    void createSavingsAccount_InvalidBalance() throws Exception {
+        accountRequest.setAccountType("savings");
+        accountRequest.setBalance(new Money(new BigDecimal("800")));
+
+        mockMvc.perform(post("/api/v1/accounts")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
     // test invalid POST requests (wrong owner id || wrong account type)
     @Test

@@ -33,8 +33,6 @@ class AccountHolderControllerImplTest {
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
 
     @BeforeEach
     void setUp() {

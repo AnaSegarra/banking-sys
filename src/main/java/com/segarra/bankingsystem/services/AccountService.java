@@ -42,11 +42,19 @@ public class AccountService {
     public AccountVM getById(int id){
         Account account = accountRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Account with id " + id + " not found"));
         if (account instanceof CheckingAccount) {
+            // apply fee if necessary
+            CheckingAccount checkingAccount = (CheckingAccount) account;
+            checkingAccount.applyMonthlyMaintenanceFee();
+            checkingAccountRepository.save(checkingAccount);
             LOGGER.info("Admin GET request to retrieve checking account with id " + id);
             return new AccountVM(account.getId(), account.getBalance(), "Checking account", account.getPrimaryOwner().getName(),
                     account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName()  : "No secondary owner assigned",  ((CheckingAccount) account).getStatus().toString());
         }
         if (account instanceof SavingsAccount) {
+            SavingsAccount savingsAccount = (SavingsAccount) account;
+            savingsAccount.applyAnnualInterest();
+            savingsAccountRepository.save(savingsAccount);
+
             LOGGER.info("Admin GET request to retrieve savings account with id " + id);
             return new AccountVM(account.getId(), account.getBalance(),
                     "Savings account", account.getPrimaryOwner().getName(),
@@ -55,6 +63,9 @@ public class AccountService {
         }
         if (account instanceof CreditCard) {
             LOGGER.info("Admin GET request to retrieve credit card with id " + id);
+            CreditCard creditCard = (CreditCard) account;
+            creditCard.applyMonthlyInterest();
+            creditCardRepository.save(creditCard);
             return new AccountVM(account.getId(), account.getBalance(),
                     "Credit card", account.getPrimaryOwner().getName(),
                     account.getSecondaryOwner() != null ? account.getSecondaryOwner().getName() : "No secondary owner assigned", "NONE");
@@ -110,7 +121,6 @@ public class AccountService {
             LOGGER.info("User GET request to retrieve credit card with id " + id);
 
             CreditCard creditCard = (CreditCard) account;
-
             creditCard.applyMonthlyInterest();
             creditCardRepository.save(creditCard);
             return new AccountVM(creditCard.getId(), creditCard.getBalance(), "Credit card", creditCard.getPrimaryOwner().getName(),

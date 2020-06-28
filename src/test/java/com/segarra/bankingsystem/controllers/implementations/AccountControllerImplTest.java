@@ -338,6 +338,17 @@ class AccountControllerImplTest {
     }
 
     @Test
+    @DisplayName("Test post request with same id for primary and secondary owner, expected 400 status code")
+    void create_SameOwnerId() throws Exception {
+        accountRequest.setSecondaryOwnerId(accountHolder.getId());
+        mockMvc.perform(post("/api/v1/accounts")
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(accountRequest))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("Test post request with wrong account type, expected 400 status code")
     void create_invalidAccountType() throws Exception {
         accountRequest.setAccountType("student");
@@ -392,6 +403,17 @@ class AccountControllerImplTest {
 
         assertEquals( new BigDecimal("2900.00"), studentAccountRepository.findById(studentAccount.getId()).get().getBalance().getAmount());
     }
+
+    @Test
+    @DisplayName("Test debit student account with not enough funds, expected 400 status code")
+    void financeAccount_DebitStudentAccount_InsufficientFunds() throws Exception {
+        debitRequest.setAmount(new BigDecimal("3100"));
+        mockMvc.perform(post("/api/v1/accounts/" + studentAccount.getId())
+                .with(user("admin").roles("ADMIN"))
+                .content(objectMapper.writeValueAsString(debitRequest))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+    }
+
 
 
     // invalid debit/credit requests

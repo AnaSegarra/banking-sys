@@ -18,7 +18,7 @@ public class Address {
     @ColumnDefault(value = "0")
     private int number;
     @NotBlank(message = "Zip code is required")
-    @Pattern(regexp="(\\d{5})", message = "Zip code must be numerical")
+    @Pattern(regexp="(\\d{5})", message = "Zip code must be numerical and have a length of 5")
     private String zipCode;
 
     public Address() {

@@ -125,6 +125,10 @@ public class AccountService {
     // create accounts of any type - admin restricted
     @Secured({"ROLE_ADMIN"})
     public Account create(AccountRequest newAccount) {
+        if(newAccount.getPrimaryOwnerId() == newAccount.getSecondaryOwnerId()){
+            LOGGER.error("Controlled exception - Attempt to create account with same primary and secondary owner");
+            throw new IllegalInputException("Primary and secondary owner must be different");
+        }
         AccountHolder primaryOwner = accountHolderRepository.findById(newAccount.getPrimaryOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getPrimaryOwnerId() + " not found"));
         AccountHolder secondaryOwner = null;
@@ -133,7 +137,9 @@ public class AccountService {
                     .orElseThrow(() -> new ResourceNotFoundException("Customer with id " + newAccount.getSecondaryOwnerId() + " not found"));
         }
 
+        LOGGER.info("Initialized account creation process");
         if((newAccount.getAccountType().equals("savings") || newAccount.getAccountType().equals("checking")) && (newAccount.getSecretKey() == null || !newAccount.getSecretKey().matches("\\d{4}")) ){
+            LOGGER.error("Controlled exception - Requested account requires a valid secret key");
             throw new IllegalInputException("Secret key required as a four length number");
         }
 
@@ -146,7 +152,7 @@ public class AccountService {
                 // prevent creation of account with starting balance under the minimum balance
                 if(savingsAccount.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) < 0){
                     LOGGER.error("Controlled exception - Requested account with balance smaller than minimum balance");
-                    throw new IllegalInputException("Account balance must be above minimum balance");
+                    throw new IllegalInputException("Account balance must be above the minimum balance of " + savingsAccount.getMinimumBalance());
                 }
 
                 LOGGER.info("Savings account created");
@@ -165,7 +171,7 @@ public class AccountService {
                 // prevent creation of account with starting balance under the minimum balance
                 if(checkingAccount.getBalance().getAmount().compareTo(checkingAccount.getMinimumBalance()) < 0){
                     LOGGER.error("Controlled exception - Requested account with balance smaller than minimum balance");
-                    throw new IllegalInputException("Account balance must be above minimum balance");
+                    throw new IllegalInputException("Account balance must be above the minimum balance of " + checkingAccount.getMinimumBalance());
                 }
                 LOGGER.info("Checking account created");
                 return checkingAccountRepository.save(checkingAccount);
@@ -223,11 +229,15 @@ public class AccountService {
 
     public void applyFinance(Account account, String operation, BigDecimal amount){
         if(operation.equals("debit")){
+            if(account.getBalance().getAmount().compareTo(amount) < 0){
+                LOGGER.error("Controlled exception - Account " + account.getId() + " doesn't have enough funds");
+                throw new IllegalInputException("Unable to process this credit: insufficient funds");
+            }
             account.getBalance().decreaseAmount(amount);
-            LOGGER.info("Admin process a debit of " + amount + " on account " + account.getId());
+            LOGGER.info("Processed a debit of " + amount + " on account " + account.getId());
         } else if (operation.equals("credit")){
             account.getBalance().increaseAmount(amount);
-            LOGGER.info("Admin process a credit of " + amount + " on account " + account.getId());
+            LOGGER.info("Processed a credit of " + amount + " on account " + account.getId());
         } else {
             LOGGER.error("Controlled exception - Not valid operation type requested");
             throw new IllegalInputException("Must enter a valid operation of either debit or credit");
@@ -238,12 +248,16 @@ public class AccountService {
     @Secured({"ROLE_ADMIN"})
     public void financeAccount(int accountId, FinanceAdminRequest financeAdminRequest){
         Account account = accountRepository.findById(accountId).orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+        LOGGER.info("Initialized process to finance account " + accountId + " by an admin");
 
         if (account instanceof CheckingAccount) {
             CheckingAccount checkingAccount = (CheckingAccount) account;
             checkingAccount.applyMonthlyMaintenanceFee();
             applyFinance(checkingAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             checkingAccount.applyPenaltyFee(checkingAccount.getMinimumBalance());
+            if(account.getBalance().getAmount().compareTo(checkingAccount.getMinimumBalance()) > 0){
+                account.setPenaltyFeeApplied(false);
+            }
             checkingAccountRepository.save(checkingAccount);
 
         } else if (account instanceof SavingsAccount) {
@@ -251,6 +265,9 @@ public class AccountService {
             savingsAccount.applyAnnualInterest();
             applyFinance(savingsAccount, financeAdminRequest.getOperation().toLowerCase(), financeAdminRequest.getAmount());
             savingsAccount.applyPenaltyFee(savingsAccount.getMinimumBalance());
+            if(account.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) > 0){
+                account.setPenaltyFeeApplied(false);
+            }
             savingsAccountRepository.save(savingsAccount);
 
         } else if (account instanceof CreditCard) {
@@ -270,35 +287,46 @@ public class AccountService {
     @Secured({"ROLE_THIRDPARTY"})
     public void financeAccount(int accountId, FinanceThirdPartyRequest financeThirdPartyRequestRequest){
         Account account = accountRepository.findById(accountId).orElseThrow(()-> new ResourceNotFoundException("Account with id " + accountId + " not found"));
+        LOGGER.info("Initialized process to finance account " + accountId + " by a third party");
 
         if (account instanceof CheckingAccount) {
             CheckingAccount checkingAccount = (CheckingAccount) account;
             if(!checkingAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
+                LOGGER.error("Controlled exception - Access denied to account " + accountId + " as secret key is not correct");
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
 
             checkingAccount.applyMonthlyMaintenanceFee();
             applyFinance(checkingAccount, financeThirdPartyRequestRequest.getOperation().toLowerCase(), financeThirdPartyRequestRequest.getAmount());
             checkingAccount.applyPenaltyFee(checkingAccount.getMinimumBalance());
+            if(account.getBalance().getAmount().compareTo(checkingAccount.getMinimumBalance()) > 0){
+                account.setPenaltyFeeApplied(false);
+            }
             checkingAccountRepository.save(checkingAccount);
 
         } else if (account instanceof SavingsAccount) {
             SavingsAccount savingsAccount = (SavingsAccount) account;
             if(!savingsAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
+                LOGGER.error("Controlled exception - Access denied to account " + accountId + " as secret key is not correct");
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
 
             savingsAccount.applyAnnualInterest();
             applyFinance(savingsAccount, financeThirdPartyRequestRequest.getOperation().toLowerCase(), financeThirdPartyRequestRequest.getAmount());
             savingsAccount.applyPenaltyFee(savingsAccount.getMinimumBalance());
+            if(account.getBalance().getAmount().compareTo(savingsAccount.getMinimumBalance()) > 0){
+                account.setPenaltyFeeApplied(false);
+            }
             savingsAccountRepository.save(savingsAccount);
 
         } else if (account instanceof CreditCard) {
+            LOGGER.error("Controlled exception - Access denied to account " + accountId + " given that it does not have a secret key");
             // throws 403 Forbidden as credit cards don't have a secret key
             throw new IllegalTransactionException("Unable to access this account");
         } else if (account instanceof StudentAccount) {
             StudentAccount studentAccount = (StudentAccount) account;
             if(!studentAccount.getSecretKey().equals(financeThirdPartyRequestRequest.getSecretKey())){
+                LOGGER.error("Controlled exception - Access denied to account " + accountId + " as secret key is not correct");
                 throw new IllegalInputException("Unable to access this account: wrong secret key");
             }
             applyFinance(studentAccount, financeThirdPartyRequestRequest.getOperation().toLowerCase(), financeThirdPartyRequestRequest.getAmount());

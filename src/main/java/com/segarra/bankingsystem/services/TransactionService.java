@@ -41,7 +41,7 @@ public class TransactionService {
            transactions any other day
         */
         if(highest != null && currentTotal != null && highest.multiply(new BigDecimal("2.5")).compareTo(currentTotal.add(transaction)) < 0){
-            LOGGER.error("Controlled exception - Transactions made today have surpassed more than 150% of the total made any other day");
+            LOGGER.error("Controlled exception - Transactions made today have surpassed more than 150% of the highest total made any other day");
             return true;
         }
 
@@ -83,7 +83,7 @@ public class TransactionService {
 
 //         verify recipient's ownership
         if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-            if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
+            if (recipientAccount.getSecondaryOwner() == null || !transaction.getRecipientName().equals(recipientAccount.getSecondaryOwner().getName())) {
                 LOGGER.error("Controlled exception - " + transaction.getRecipientName() + " is not the owner nor the co-owner of account " + transaction.getRecipientId());
                 throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
             }

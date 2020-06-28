@@ -25,7 +25,7 @@ public class AccountHolderControllerImpl implements AccountHolderController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public AccountHolder create(@Valid @RequestBody AccountHolder accountHolder) {
+    public AccountHolderVM create(@Valid @RequestBody AccountHolder accountHolder) {
         return accountHolderService.create(accountHolder);
     }
 }

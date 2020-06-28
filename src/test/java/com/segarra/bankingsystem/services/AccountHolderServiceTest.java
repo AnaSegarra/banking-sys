@@ -1,5 +1,6 @@
 package com.segarra.bankingsystem.services;
 
+import com.segarra.bankingsystem.dto.AccountHolderVM;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.segarra.bankingsystem.models.AccountHolder;
@@ -65,7 +66,7 @@ class AccountHolderServiceTest {
         when(accountHolderRepository.save(any(AccountHolder.class))).thenReturn(accountHolder);
         when(roleRepository.save(any(Role.class))).thenReturn(role);
 
-        AccountHolder savedAccHolder = accountHolderService.create(accountHolder);
+        AccountHolderVM savedAccHolder = accountHolderService.create(accountHolder);
         assertEquals("Sergio", savedAccHolder.getName());
     }
 }

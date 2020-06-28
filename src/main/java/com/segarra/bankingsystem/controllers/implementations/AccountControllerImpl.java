@@ -42,7 +42,7 @@ public class AccountControllerImpl implements AccountController {
 
     @PostMapping("/accounts/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void financeAccount(@PathVariable("id") int id, @RequestBody FinanceAdminRequest financeAdminRequest) {
+    public void financeAccount(@PathVariable("id") int id, @RequestBody @Valid FinanceAdminRequest financeAdminRequest) {
         accountService.financeAccount(id, financeAdminRequest);
     }
 

@@ -38,7 +38,7 @@ public class AccountHolderService {
 
     // create new account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
-    public AccountHolder create(AccountHolder accountHolder){
+    public AccountHolderVM create(AccountHolder accountHolder){
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());
         if(foundUser != null){
             LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
@@ -50,6 +50,7 @@ public class AccountHolderService {
         Role role = new Role("ROLE_ACCOUNTHOLDER", newUser);
         roleRepository.save(role);
         LOGGER.info("Account holder created " + newUser);
-        return newUser;
+        return new AccountHolderVM(newUser.getId(), accountHolder.getName(), accountHolder.getUsername(),
+                accountHolder.getBirthday(), accountHolder.getPrimaryAddress(), accountHolder.getMailingAddress());
     }
 }

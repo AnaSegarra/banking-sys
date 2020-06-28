@@ -1,5 +1,7 @@
 package com.segarra.bankingsystem.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -18,6 +20,7 @@ public class User {
     private String password;
 
     @OneToMany(fetch= FetchType.EAGER, cascade= CascadeType.ALL, mappedBy="user")
+    @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
     public User() {

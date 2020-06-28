@@ -43,7 +43,7 @@ class CreditCardServiceTest {
 
         CreditCard creditCard = new CreditCard(accountHolder2,
                 new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));
-        CreditCard creditCard2 = new CreditCard(accountHolder2,
+        CreditCard creditCard2 = new CreditCard(accountHolder,
                 new Money(new BigDecimal("5000")), new BigDecimal("300"), new BigDecimal("0.15"));
         creditCardList = Arrays.asList(creditCard, creditCard2);
     }

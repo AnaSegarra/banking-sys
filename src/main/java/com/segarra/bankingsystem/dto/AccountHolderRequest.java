@@ -2,22 +2,31 @@ package com.segarra.bankingsystem.dto;
 
 import com.segarra.bankingsystem.models.Address;
 
+import javax.persistence.Embedded;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class AccountHolderRequest {
-    private int id;
-    private String name;
+    @NotNull(message = "A username is required")
     private String username;
+    @NotNull(message = "A password is required")
     private String password;
+    @NotBlank(message = "Name is required")
+    private String name;
+    @NotNull(message = "Birthday is required")
     private LocalDate birthday;
+    @Valid
+    @NotNull(message = "A primary address is required")
     private Address primaryAddress;
+    @Valid
     private Address mailingAddress;
 
     public AccountHolderRequest() {
     }
 
-    public AccountHolderRequest(int id, String name, String username, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
-        this.id = id;
+    public AccountHolderRequest(String name, String username, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
         this.name = name;
         this.username = username;
         this.birthday = birthday;
@@ -73,11 +82,14 @@ public class AccountHolderRequest {
         this.password = password;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    public String toString() {
+        return "AccountHolderRequest{" +
+                "username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", primaryAddress=" + primaryAddress +
+                ", mailingAddress=" + mailingAddress +
+                '}';
     }
 }

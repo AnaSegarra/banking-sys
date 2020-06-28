@@ -1,7 +1,6 @@
 package com.segarra.bankingsystem.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -41,7 +40,7 @@ public class AccountHolder {
     @JsonIgnore
     private List<Account> secondaryAccounts;
     @OneToOne
-    private AccountUser accountUser;
+    private ClientUser clientUser;
 
     public AccountHolder() {
     }
@@ -107,12 +106,12 @@ public class AccountHolder {
         this.mailingAddress = mailingAddress;
     }
 
-    public AccountUser getAccountUser() {
-        return accountUser;
+    public ClientUser getClientUser() {
+        return clientUser;
     }
 
-    public void setAccountUser(AccountUser accountUser) {
-        this.accountUser = accountUser;
+    public void setClientUser(ClientUser clientUser) {
+        this.clientUser = clientUser;
     }
 
     public int getId() {
@@ -123,15 +122,5 @@ public class AccountHolder {
         this.id = id;
     }
 
-
-    @Override
-    public String toString() {
-        return "{" +
-                "name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", primaryAddress=" + primaryAddress +
-                ", mailingAddress=" + mailingAddress +
-                '}';
-    }
 }
 

@@ -48,9 +48,9 @@ public class AccountHolderService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         AccountHolder accountHolder = new AccountHolder(newUser.getUsername(), newUser.getBirthday(), newUser.getPrimaryAddress(), newUser.getMailingAddress());
         accountHolderRepository.save(accountHolder);
-        AccountUser accountUser = new AccountUser(newUser.getUsername(), passwordEncoder.encode(newUser.getPassword()), accountHolder);
-        userRepository.save(accountUser);
-        Role role = new Role("ROLE_ACCOUNTHOLDER", accountUser);
+        ClientUser clientUser = new ClientUser(newUser.getUsername(), passwordEncoder.encode(newUser.getPassword()), accountHolder);
+        userRepository.save(clientUser);
+        Role role = new Role("ROLE_ACCOUNTHOLDER", clientUser);
         roleRepository.save(role);
         LOGGER.info("Account holder created " + newUser);
 

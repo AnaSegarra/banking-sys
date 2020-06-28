@@ -5,15 +5,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 @Entity
-public class AccountUser extends User{
-    @OneToOne(mappedBy = "accountUser", cascade = CascadeType.ALL)
+public class ClientUser extends User{
+    @OneToOne(mappedBy = "clientUser", cascade = CascadeType.ALL)
     @JsonIgnore
     private AccountHolder accountHolder;
 
-    public AccountUser() {
+    public ClientUser() {
     }
 
-    public AccountUser(String username, String password, AccountHolder accountHolder) {
+    public ClientUser(String username, String password) {
+        super(username, password);
+    }
+
+    public ClientUser(String username, String password, AccountHolder accountHolder) {
         super(username, password);
         this.accountHolder = accountHolder;
     }

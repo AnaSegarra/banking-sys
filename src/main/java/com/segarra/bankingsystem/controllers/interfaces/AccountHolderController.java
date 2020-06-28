@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface AccountHolderController {
     List<AccountHolderVM> getAll();
-    User create(AccountHolder accountHolder);
+    AccountHolder create(AccountHolder accountHolder);
 }

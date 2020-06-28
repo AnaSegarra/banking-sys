@@ -229,7 +229,7 @@ public class AccountService {
             account.getBalance().increaseAmount(amount);
             LOGGER.info("Admin process a credit of " + amount + " on account " + account.getId());
         } else {
-            LOGGER.error("");
+            LOGGER.error("Controlled exception - Not valid operation type requested");
             throw new IllegalInputException("Must enter a valid operation of either debit or credit");
         }
     }

@@ -73,21 +73,21 @@ public class TransactionService {
         Account recipientAccount = accountRepository.findById(transaction.getRecipientId())
                 .orElseThrow(()-> new ResourceNotFoundException("Recipient account with id " + transaction.getRecipientId() + " not found"));
 
-        // verify sender account ownership
-//        if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
-//            if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
-//                LOGGER.error("Controlled exception - " + user.getUsername() + " tried to access an account not owned by them");
-//                throw new IllegalTransactionException("Unable to access this account"); // throws 403 Forbidden
-//            }
-//        }
+//         verify sender account ownership
+        if(!senderAccount.getPrimaryOwner().getUsername().equals(user.getUsername())){
+            if(senderAccount.getSecondaryOwner() == null || !senderAccount.getSecondaryOwner().getUsername().equals(user.getUsername())){
+                LOGGER.error("Controlled exception - " + user.getUsername() + " tried to access an account not owned by them");
+                throw new IllegalTransactionException("Unable to access this account"); // throws 403 Forbidden
+            }
+        }
 
-        // verify recipient's ownership
-//        if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
-//            if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
-//                LOGGER.error("Controlled exception - " + transaction.getRecipientName() + " is not the owner nor the co-owner of account " + transaction.getRecipientId());
-//                throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
-//            }
-//        }
+//         verify recipient's ownership
+        if(!transaction.getRecipientName().equals(recipientAccount.getPrimaryOwner().getName())) {
+            if (recipientAccount.getSecondaryOwner() == null || !recipientAccount.getSecondaryOwner().getUsername().equals(user.getUsername())) {
+                LOGGER.error("Controlled exception - " + transaction.getRecipientName() + " is not the owner nor the co-owner of account " + transaction.getRecipientId());
+                throw new IllegalInputException(transaction.getRecipientName() + " is neither the owner or co-owner of the account " + transaction.getRecipientId());
+            }
+        }
 
         // check sender account funds
         if(senderAccount.getBalance().getAmount().compareTo(transaction.getAmount()) < 0){

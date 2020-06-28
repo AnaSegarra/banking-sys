@@ -1,6 +1,5 @@
 package com.segarra.bankingsystem.services;
 
-import com.segarra.bankingsystem.dto.AccountHolderRequest;
 import com.segarra.bankingsystem.dto.AccountHolderVM;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.models.*;
@@ -39,7 +38,7 @@ public class AccountHolderService {
 
     // create new account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
-    public User create(AccountHolder accountHolder){
+    public AccountHolder create(AccountHolder accountHolder){
         User foundUser = userRepository.findByUsername(accountHolder.getUsername());
         if(foundUser != null){
             LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
@@ -47,7 +46,7 @@ public class AccountHolderService {
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
-        User newUser = userRepository.save(accountHolder);
+        AccountHolder newUser = accountHolderRepository.save(accountHolder);
         Role role = new Role("ROLE_ACCOUNTHOLDER", newUser);
         roleRepository.save(role);
         LOGGER.info("Account holder created " + newUser);

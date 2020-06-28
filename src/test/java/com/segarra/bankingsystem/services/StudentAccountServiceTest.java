@@ -23,34 +23,34 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class StudentAccountServiceTest {
-//    @Autowired
-//    private StudentAccountService studentAccountService;
-//
-//    @MockBean
-//    private StudentAccountRepository studentAccountRepository;
-//
-//    private List<StudentAccount> studentAccountList;
-//
-//
-//    @BeforeEach
-//    void setUp() {
-//        AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
-//                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
-//        AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
-//                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "ana_s");
-//
-//        StudentAccount studentAccount = new StudentAccount(accountHolder,
-//                new Money(new BigDecimal("2000")), "1234");
-//        StudentAccount studentAccount2 = new StudentAccount(accountHolder2,
-//                new Money(new BigDecimal("5000")), "1234");
-//        studentAccountList = Arrays.asList(studentAccount, studentAccount2);
-//    }
-//
-//    @Test
-//    @WithMockUser(roles = "ADMIN")
-//    @DisplayName("Unit test - retrieval of all student accounts")
-//    void getAll() {
-//        when(studentAccountRepository.findAll()).thenReturn(studentAccountList);
-//        assertEquals(2, studentAccountService.getAll().size());
-//    }
+    @Autowired
+    private StudentAccountService studentAccountService;
+
+    @MockBean
+    private StudentAccountRepository studentAccountRepository;
+
+    private List<StudentAccount> studentAccountList;
+
+
+    @BeforeEach
+    void setUp() {
+        AccountHolder accountHolder = new AccountHolder("Gema", LocalDate.of(2000, 10, 20),
+                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "gema_s");
+        AccountHolder accountHolder2 = new AccountHolder("Gabi", LocalDate.of(2017, 1, 10),
+                new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "ana_s");
+
+        StudentAccount studentAccount = new StudentAccount(accountHolder,
+                new Money(new BigDecimal("2000")), "1234");
+        StudentAccount studentAccount2 = new StudentAccount(accountHolder2,
+                new Money(new BigDecimal("5000")), "1234");
+        studentAccountList = Arrays.asList(studentAccount, studentAccount2);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("Unit test - retrieval of all student accounts")
+    void getAll() {
+        when(studentAccountRepository.findAll()).thenReturn(studentAccountList);
+        assertEquals(2, studentAccountService.getAll().size());
+    }
 }

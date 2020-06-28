@@ -3,11 +3,11 @@ package com.segarra.bankingsystem.models;
 import javax.persistence.*;
 
 @Entity
-public class AdminUser extends User{
-    public AdminUser() {
+public class Admin extends User{
+    public Admin() {
     }
 
-    public AdminUser(String username, String password) {
+    public Admin(String username, String password) {
         super(username, password);
     }
 }

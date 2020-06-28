@@ -10,11 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "account_holders")
-public class AccountHolder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+public class AccountHolder extends User{
     @NotBlank(message = "Name is required")
     private String name;
     @NotNull(message = "Birthday is required")
@@ -39,23 +35,24 @@ public class AccountHolder {
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
     private List<Account> secondaryAccounts;
-    @OneToOne
-    private ClientUser clientUser;
 
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username) {
+        super(username, password);
+        this.name = name;
+        this.birthday = birthday;
+        this.primaryAddress = primaryAddress;
+    }
+
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password,
+                         String username, Address mailingAddress) {
+        super(username, password);
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
-    }
-
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress) {
-        this.name = name;
-        this.birthday = birthday;
-        this.primaryAddress = primaryAddress;
     }
 
     public List<Account> getAccounts() {
@@ -106,21 +103,14 @@ public class AccountHolder {
         this.mailingAddress = mailingAddress;
     }
 
-    public ClientUser getClientUser() {
-        return clientUser;
+    @Override
+    public String toString() {
+        return "{" +
+                "name='" + name + '\'' +
+                ", birthday=" + birthday +
+                ", primaryAddress=" + primaryAddress +
+                ", mailingAddress=" + mailingAddress +
+                '}';
     }
-
-    public void setClientUser(ClientUser clientUser) {
-        this.clientUser = clientUser;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
 }
 

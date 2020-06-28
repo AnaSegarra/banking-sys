@@ -4,6 +4,7 @@ import com.segarra.bankingsystem.controllers.interfaces.AccountHolderController;
 import com.segarra.bankingsystem.dto.AccountHolderRequest;
 import com.segarra.bankingsystem.dto.AccountHolderVM;
 import com.segarra.bankingsystem.models.AccountHolder;
+import com.segarra.bankingsystem.models.User;
 import com.segarra.bankingsystem.services.AccountHolderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class AccountHolderControllerImpl implements AccountHolderController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public AccountHolderVM create(@Valid @RequestBody AccountHolderRequest accountHolder) {
+    public User create(@Valid @RequestBody AccountHolder accountHolder) {
         return accountHolderService.create(accountHolder);
     }
 }

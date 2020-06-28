@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public class AccountHolderVM {
     private int id;
     private String name;
+    private String username;
     private LocalDate birthday;
     private Address primaryAddress;
     private Address mailingAddress;
@@ -14,20 +15,13 @@ public class AccountHolderVM {
     public AccountHolderVM() {
     }
 
-    public AccountHolderVM(int id, String name, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
+    public AccountHolderVM(int id, String name, String username, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
         this.id = id;
         this.name = name;
+        this.username = username;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -36,6 +30,14 @@ public class AccountHolderVM {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public LocalDate getBirthday() {
@@ -60,5 +62,13 @@ public class AccountHolderVM {
 
     public void setMailingAddress(Address mailingAddress) {
         this.mailingAddress = mailingAddress;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

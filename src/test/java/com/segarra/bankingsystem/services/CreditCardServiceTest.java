@@ -24,35 +24,35 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class CreditCardServiceTest {
-    @Autowired
-    private CreditCardService creditCardService;
-
-    @MockBean
-    private CreditCardRepository creditCardRepository;
-    @MockBean
-    private AccountHolderRepository accountHolderRepository;
-
-    private List<CreditCard> creditCardList;
-
-    @BeforeEach
-    void setUp() {
-        AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
-                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
-        AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
-                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
-
-        CreditCard creditCard = new CreditCard(accountHolder2,
-                new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));
-        CreditCard creditCard2 = new CreditCard(accountHolder2,
-                new Money(new BigDecimal("5000")), new BigDecimal("300"), new BigDecimal("0.15"));
-        creditCardList = Arrays.asList(creditCard, creditCard2);
-    }
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    @DisplayName("Unit test - retrieval of all credit cards")
-    void getAll() {
-        when(creditCardRepository.findAll()).thenReturn(creditCardList);
-        assertEquals(2, creditCardService.getAll().size());
-    }
+//    @Autowired
+//    private CreditCardService creditCardService;
+//
+//    @MockBean
+//    private CreditCardRepository creditCardRepository;
+//    @MockBean
+//    private AccountHolderRepository accountHolderRepository;
+//
+//    private List<CreditCard> creditCardList;
+//
+//    @BeforeEach
+//    void setUp() {
+//        AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
+//                new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
+//        AccountHolder accountHolder = new AccountHolder("Ana", LocalDate.of(1994, 4, 16),
+//                new Address("Spain", "Madrid", "Madrid Avenue", 8, "28700"), "1234", "ana_s");
+//
+//        CreditCard creditCard = new CreditCard(accountHolder2,
+//                new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));
+//        CreditCard creditCard2 = new CreditCard(accountHolder2,
+//                new Money(new BigDecimal("5000")), new BigDecimal("300"), new BigDecimal("0.15"));
+//        creditCardList = Arrays.asList(creditCard, creditCard2);
+//    }
+//
+//    @Test
+//    @WithMockUser(roles = "ADMIN")
+//    @DisplayName("Unit test - retrieval of all credit cards")
+//    void getAll() {
+//        when(creditCardRepository.findAll()).thenReturn(creditCardList);
+//        assertEquals(2, creditCardService.getAll().size());
+//    }
 }

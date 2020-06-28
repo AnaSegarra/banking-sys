@@ -11,10 +11,10 @@ REST API that recreates some of the functionalities of a banking system. This AP
 To run this project locally do the following after cloning the project:
 
 1. Create two databases: `banking_sys` and `banking_sys_test`
-2. Insert your own credentials in the application.properties files, both in /main folder and /test folder
+2. Insert own credentials in the application.properties files, both in /main folder and /test folder
 3. Run `mvn spring-boot:run` to launch the application
 
-To start with some seed data, a `seeds.sql` file is provided. It seeds the database with an admin, a third party user and three account holders, one being younger than 24 years. Once the program is running to ensure that database named `banking_sys` exists, seed it doing one of the following options:
+To start with some seed data, a `seeds.sql` file is provided. It seeds the database with an admin, a third party user and three account holders, one being younger than 24 years. Once the program is running and database named `banking_sys` exists, seed it doing one of the following options:
 
 - Open the file and execute it from MySQL Workbench
 - Run the command `mysql -u <username> -p -n banking_sys < seeds.sql` , which will prompt for user's password
@@ -52,7 +52,7 @@ There are some additional endpoints with no response:
 
 Logged account holders can transfer money from any of their accounts to another account through a POST request to /api/v1/transactions
 
-Full API documentation can be found at [https://documenter.getpostman.com/view/10354400/T17AkBfm?version=latest](https://documenter.getpostman.com/view/10354400/T17AkBfm?version=latest)
+Full API documentation can be found at [https://documenter.getpostman.com/view/10354400/T17AkBfm?version=latest](https://documenter.getpostman.com/view/10354400/T17AkBfm?version=latest). Additionally, `Banking_System.json` file can be imported into Postman to test the API.
 
 ## Technologies
 

@@ -1,0 +1,1404 @@
+{
+	"info": {
+		"_postman_id": "0fc021c7-9ed1-4758-952c-772c70bc2708",
+		"name": "Banking System",
+		"description": "# API documentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all account holders",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				},
+				"description": "Endpoint to retrieve data from every account holder in the system. Route **protected** for **admins**."
+			},
+			"response": [
+				{
+					"name": "Get all account holders",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Set-Cookie",
+							"value": "JSESSIONID=374C1E9AA4F6A11BFC7C947B24A79722; Path=/; HttpOnly"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 18:59:48 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 2,\n        \"name\": \"Ana Segarra\",\n        \"username\": \"ana_s\",\n        \"birthday\": \"1994-04-16\",\n        \"primaryAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Madrid\",\n            \"street\": \"avda Madrid\",\n            \"number\": 8,\n            \"zipCode\": \"28700\"\n        },\n        \"mailingAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Boadilla del Monte\",\n            \"street\": \"avda Cantabria\",\n            \"number\": 13,\n            \"zipCode\": \"28600\"\n        }\n    },\n    {\n        \"id\": 3,\n        \"name\": \"Gema Segarra\",\n        \"username\": \"gema_s\",\n        \"birthday\": \"1991-10-20\",\n        \"primaryAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Madrid\",\n            \"street\": \"avda Luna\",\n            \"number\": 13,\n            \"zipCode\": \"28200\"\n        },\n        \"mailingAddress\": null\n    },\n    {\n        \"id\": 4,\n        \"name\": \"Gabi\",\n        \"username\": \"gabi_c\",\n        \"birthday\": \"2017-01-10\",\n        \"primaryAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Madrid\",\n            \"street\": \"avda Luna\",\n            \"number\": 13,\n            \"zipCode\": \"28200\"\n        },\n        \"mailingAddress\": null\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get all {type of} accounts",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/checking-accounts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"checking-accounts"
+					]
+				},
+				"description": "Endpoint to retrieve every account in the system of a specific type. Route **protected** for **admins**. \nReplace \"/checking-accounts\" by \"/savings-accounts\", \"/credit-cards\" and \"/student-accounts\" in order to fetch accounts of these types."
+			},
+			"response": [
+				{
+					"name": "Get all {type of} accounts",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/checking-accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"checking-accounts"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 17:28:55 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 2,\n        \"primaryOwner\": {\n            \"id\": 2,\n            \"username\": \"ana_s\",\n            \"password\": \"$2a$10$Jdq.cL5ngkpxhfvPiDF6peZhyuVrTtuytK2SCewgh7F3oAWfejEmG\",\n            \"name\": \"Ana Segarra\",\n            \"birthday\": \"1994-04-16\",\n            \"primaryAddress\": {\n                \"country\": \"Spain\",\n                \"city\": \"Madrid\",\n                \"street\": \"avda Madrid\",\n                \"number\": 8,\n                \"zipCode\": \"28700\"\n            },\n            \"mailingAddress\": {\n                \"country\": \"Spain\",\n                \"city\": \"Boadilla del Monte\",\n                \"street\": \"avda Cantabria\",\n                \"number\": 13,\n                \"zipCode\": \"28600\"\n            }\n        },\n        \"secondaryOwner\": null,\n        \"balance\": {\n            \"currency\": \"EUR\",\n            \"amount\": 3000\n        },\n        \"penaltyFeeApplied\": false,\n        \"penaltyFee\": 40,\n        \"monthlyMaintenanceFee\": 12,\n        \"minimumBalance\": 250,\n        \"secretKey\": \"1234\",\n        \"status\": \"ACTIVE\",\n        \"lastFeeApplied\": \"2020-06-28T19:27:45.405165\"\n    },\n    {\n        \"id\": 3,\n        \"primaryOwner\": {\n            \"id\": 3,\n            \"username\": \"gema_s\",\n            \"password\": \"$2a$10$GZ0EFD0iKbHRsXNYAjkDjOIwJyDRR7F1J2N2V.QIczit/jetfR2Dq\",\n            \"name\": \"Gema Segarra\",\n            \"birthday\": \"1991-10-20\",\n            \"primaryAddress\": {\n                \"country\": \"Spain\",\n                \"city\": \"Madrid\",\n                \"street\": \"avda Luna\",\n                \"number\": 13,\n                \"zipCode\": \"28200\"\n            },\n            \"mailingAddress\": null\n        },\n        \"secondaryOwner\": null,\n        \"balance\": {\n            \"currency\": \"EUR\",\n            \"amount\": 1500\n        },\n        \"penaltyFeeApplied\": false,\n        \"penaltyFee\": 40,\n        \"monthlyMaintenanceFee\": 12,\n        \"minimumBalance\": 250,\n        \"secretKey\": \"1234\",\n        \"status\": \"ACTIVE\",\n        \"lastFeeApplied\": \"2020-06-28T19:27:56.770261\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get account by id",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts",
+						"1"
+					]
+				},
+				"description": "Endpoint to retrieve an account with specified id. Route **protected** for **admins**. \n"
+			},
+			"response": [
+				{
+					"name": "Get account by id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/accounts/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 19:01:31 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 1,\n    \"balance\": {\n        \"currency\": \"EUR\",\n        \"amount\": 2000\n    },\n    \"accountType\": \"Savings account\",\n    \"primaryOwner\": \"Ana Segarra\",\n    \"secondaryOwner\": \"Gema Segarra\",\n    \"status\": \"ACTIVE\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Get all user's accounts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "gema_s",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [],
+					"options": {
+						"urlencoded": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/accounts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"accounts"
+					]
+				},
+				"description": "Endpoint to retrieve every account owned by current user, whether they are the primary or the secondary owner. Route **protected** for **account holders**. \nThis route takes an `id` as path variable to retrieve a specific account owned by this user. "
+			},
+			"response": [
+				{
+					"name": "Get all user's accounts",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [],
+							"options": {
+								"urlencoded": {}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"accounts"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 17:42:29 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 3,\n        \"balance\": {\n            \"currency\": \"EUR\",\n            \"amount\": 1500\n        },\n        \"accountType\": \"Checking account\",\n        \"primaryOwner\": \"Gema Segarra\",\n        \"secondaryOwner\": \"No secondary owner assigned\",\n        \"status\": \"ACTIVE\"\n    },\n    {\n        \"id\": 1,\n        \"balance\": {\n            \"currency\": \"EUR\",\n            \"amount\": 2000\n        },\n        \"accountType\": \"Savings account\",\n        \"primaryOwner\": \"Ana Segarra\",\n        \"secondaryOwner\": \"Gema Segarra\",\n        \"status\": \"ACTIVE\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Get user's account by id ",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "ana_s",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/accounts/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"accounts",
+						"2"
+					]
+				},
+				"description": "Endpoint to retrieve an account with chosen id. Route **protected** for **account holders**. \nTo get the desired response, logged user must be either primary or secondary owner to this account."
+			},
+			"response": [
+				{
+					"name": "Get user's account by id ",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users/accounts/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"accounts",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 19:02:43 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"balance\": {\n        \"currency\": \"EUR\",\n        \"amount\": 2000\n    },\n    \"accountType\": \"Credit card\",\n    \"primaryOwner\": \"Ana Segarra\",\n    \"secondaryOwner\": \"No secondary owner assigned\",\n    \"status\": \"NONE\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Create accountholder",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Ana Segarra\",\n  \"username\": \"ana_s\",\n  \"password\": \"1234\",\n  \"birthday\": \"1994-04-16\",\n  \"primaryAddress\": {\n    \"city\": \"Madrid\",\n    \"country\": \"Spain\",\n    \"street\": \"avda Madrid\",\n    \"number\": 8,\n    \"zipCode\": \"28700\"\n  },\n  \"mailingAddress\": {\n    \"country\": \"Spain\",\n    \"city\": \"Boadilla del Monte\",\n    \"street\": \"avda Cantabria\",\n    \"number\": 13,\n    \"zipCode\": \"28600\"\n  }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				},
+				"description": "Endpoint to create a new account holder. Route **protected** for **admins**. `mailingAddress` field is optional, every other field is required."
+			},
+			"response": [
+				{
+					"name": "Create accountholder",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ana Segarra\",\n    \"password\": \"1234\",\n    \"birthday\": \"1994-04-16\",\n    \"primaryAddress\": {\n        \"city\": \"Madrid\",\n        \"country\": \"Spain\",\n        \"street\": \"avda Madrid\",\n        \"number\": 8,\n        \"zipCode\": \"28700\"\n    },\n    \"mailingAddress\": {\n        \"city\": \"Boadilla del Monte\",\n        \"country\": \"Spain\",\n        \"street\": \"avda Cantabria\",\n        \"number\": 13,\n        \"zipCode\": \"28600\"\n    },\n    \"username\": \"ana_s\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 27 Jun 2020 21:00:28 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"name\": \"Ana Segarra\",\n    \"username\": \"ana_s\",\n    \"birthday\": \"1994-04-16\",\n    \"primaryAddress\": {\n        \"country\": \"Spain\",\n        \"city\": \"Madrid\",\n        \"street\": \"avda Madrid\",\n        \"number\": 8,\n        \"zipCode\": \"28700\"\n    },\n    \"mailingAddress\": {\n        \"country\": \"Spain\",\n        \"city\": \"Boadilla del Monte\",\n        \"street\": \"avda Cantabria\",\n        \"number\": 13,\n        \"zipCode\": \"28600\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Create third-party user",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"password\": \"1234\",\n    \"username\": \"company_1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/third-parties",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"third-parties"
+					]
+				},
+				"description": "Endpoint to create a new third party user. Route **protected** for **admins**. Both `username` and `password` are required in order to create third parties. "
+			},
+			"response": [
+				{
+					"name": "Create third-party user",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"1234\",\n    \"username\": \"company_1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/third-parties",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"third-parties"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 11:18:13 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 3,\n    \"username\": \"company_1\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Create account",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"primaryOwnerId\": 2,\n    \"secondaryOwnerId\": 3,\n    \"balance\": {\n        \"amount\": 2000\n    },\n    \"accountType\": \"savings\",\n    \"secretKey\": \"1234\",\n    \"savingsMinimumBalance\": 500,\n    \"savingsInterestRate\": 0.1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts"
+					]
+				},
+				"description": "Endpoint to create every accounts of any type. Route **protected** for **admins**. \n`balance`, `primaryOwnerId` and `acountType` fields are required in every case. All accounts, but credit-cards, require a `secretKey`. Valid account types are `checking`, `savings` and `credit-card`.\n* When creating a savings account, additional fields accepted are: `savingsMinimumBalance` and `savingsInterestRate`.\n* When creating a credit card, additional fields accepted are: `creditCardLimit` and `cardInterestRate`."
+			},
+			"response": [
+				{
+					"name": "Create account",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"primaryOwnerId\": 2,\n    \"secondaryOwnerId\": 3,\n    \"balance\": {\n        \"amount\": 2000\n    },\n    \"accountType\": \"savings\",\n    \"secretKey\": \"1234\",\n    \"savingsMinimumBalance\": 500,\n    \"savingsInterestRate\": 0.1\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/accounts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 19:04:42 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 3,\n    \"primaryOwner\": {\n        \"id\": 2,\n        \"username\": \"ana_s\",\n        \"password\": \"$2a$10$Jdq.cL5ngkpxhfvPiDF6peZhyuVrTtuytK2SCewgh7F3oAWfejEmG\",\n        \"name\": \"Ana Segarra\",\n        \"birthday\": \"1994-04-16\",\n        \"primaryAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Madrid\",\n            \"street\": \"avda Madrid\",\n            \"number\": 8,\n            \"zipCode\": \"28700\"\n        },\n        \"mailingAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Boadilla del Monte\",\n            \"street\": \"avda Cantabria\",\n            \"number\": 13,\n            \"zipCode\": \"28600\"\n        }\n    },\n    \"secondaryOwner\": {\n        \"id\": 3,\n        \"username\": \"gema_s\",\n        \"password\": \"$2a$10$GZ0EFD0iKbHRsXNYAjkDjOIwJyDRR7F1J2N2V.QIczit/jetfR2Dq\",\n        \"name\": \"Gema Segarra\",\n        \"birthday\": \"1991-10-20\",\n        \"primaryAddress\": {\n            \"country\": \"Spain\",\n            \"city\": \"Madrid\",\n            \"street\": \"avda Luna\",\n            \"number\": 13,\n            \"zipCode\": \"28200\"\n        },\n        \"mailingAddress\": null\n    },\n    \"balance\": {\n        \"currency\": \"EUR\",\n        \"amount\": 2000\n    },\n    \"penaltyFeeApplied\": false,\n    \"penaltyFee\": 40,\n    \"interestRate\": 0.1,\n    \"secretKey\": \"1234\",\n    \"status\": \"ACTIVE\",\n    \"minimumBalance\": 500,\n    \"lastInterestApplied\": \"2020-06-28T21:04:42.378167\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "ana_s",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"recipientName\": \"Ana Segarra\",\n    \"recipientId\": 3,\n    \"senderId\": 1,\n    \"amount\": 100\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"transactions"
+					]
+				},
+				"description": "Endpoint to transfer money from any account owned by the current user (both as primary and secondary owner) to any other account. Route **protected** for **account holders**. `recipientName` field must be either the primary owner or the secondary owner of the recipient account."
+			},
+			"response": [
+				{
+					"name": "Transaction",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"recipientName\": \"Ana Segarra\",\n    \"recipientId\": 3,\n    \"senderId\": 1,\n    \"amount\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/transactions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"transactions"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 18:47:12 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Apply debit/credit by Admin",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 200,\n    \"operation\": \"debit\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts",
+						"1"
+					]
+				},
+				"description": "Endpoint to debit or credit an account with a specific id (path variable). Route **protected** for **admins**. Both fields are required and `operation` takes values of `debit` and `credit`."
+			},
+			"response": [
+				{
+					"name": "Apply debit/credit by Admin",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 200,\n    \"operation\": \"debit\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/accounts/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"accounts",
+								"1"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 16:29:50 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Apply debit/credit by ThirdParty",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "company_1",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 500,\n    \"operation\": \"credit\", \n    \"secretKey\": 1234\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/third-parties/accounts/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"third-parties",
+						"accounts",
+						"1"
+					]
+				},
+				"description": "Endpoint to debit or credit an account with a specific id (path variable). Route **protected** for **third party users**. Fields are required and `operation` takes values of `debit` and `credit`. `secretKey` has to match the secret key of the account to debit/credit. Beware that credit cards don't have a secret key so third party users can't access them. "
+			},
+			"response": [
+				{
+					"name": "Apply debit/credit by ThirdParty",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 300,\n    \"operation\": \"credit\", \n    \"secretKey\": 1234\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/v1/third-parties/accounts/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"third-parties",
+								"accounts",
+								"4"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 28 Jun 2020 16:35:09 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "Update account status",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts/2/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts",
+						"2",
+						"status"
+					]
+				},
+				"description": "Endpoint to unfreeze a previously frozen account with a specific id (path variable). Route **protected** for **admins**. \nThis endpoint doesn't require a request body given that account status can only be updated to ACTIVE from FROZEN, but no viceversa. "
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8a319e84-3fbd-491f-a3f4-633d2d3dbe3b",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b176edb8-ab80-4696-a136-ca5b7e8b6062",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -6,8 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +20,8 @@ public class SavingsAccount extends Account {
     @DecimalMin(value = "0", message = "Interest rate shouldn't be a negative value")
     @Column(columnDefinition = "DECIMAL(5,4)")
     private BigDecimal interestRate;
-    protected int secretKey;
+    @NotNull(message = "Secret key required")
+    protected String secretKey;
     @Enumerated(value = EnumType.STRING)
     protected Status status;
     @DecimalMax(value = "1000", message = "Minimum balance must be below 1000")
@@ -35,7 +35,7 @@ public class SavingsAccount extends Account {
     }
 
     public SavingsAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner, Money balance,
-                          BigDecimal interestRate, int secretKey, BigDecimal minimumBalance) {
+                          BigDecimal interestRate, String secretKey, BigDecimal minimumBalance) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         setInterestRate(interestRate);
@@ -44,7 +44,7 @@ public class SavingsAccount extends Account {
         this.lastInterestApplied = LocalDateTime.now();
     }
 
-    public SavingsAccount(AccountHolder primaryOwner, Money balance, BigDecimal interestRate, int secretKey,
+    public SavingsAccount(AccountHolder primaryOwner, Money balance, BigDecimal interestRate, String secretKey,
                           BigDecimal minimumBalance) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
@@ -62,11 +62,11 @@ public class SavingsAccount extends Account {
         this.interestRate = interestRate == null ? new BigDecimal("0.0025") : interestRate;
     }
 
-    public int getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
-    public void setSecretKey(int secretKey) {
+    public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -105,5 +105,14 @@ public class SavingsAccount extends Account {
             }
             lastInterestApplied = lastInterestApplied.plusYears(years);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "SavingsAccount {" +
+                "id=" + id +
+                ", balance=" + balance +
+                ", status=" + status +
+                '}';
     }
 }

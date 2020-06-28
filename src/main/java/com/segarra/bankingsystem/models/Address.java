@@ -1,9 +1,9 @@
 package com.segarra.bankingsystem.models;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import javax.persistence.Embeddable;
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.*;
 
 @Embeddable
 public class Address {
@@ -15,8 +15,10 @@ public class Address {
     private String street;
     @Digits(integer = 3, fraction = 0, message = "Valid street number is required")
     @Min(1)
+    @ColumnDefault(value = "0")
     private int number;
     @NotBlank(message = "Zip code is required")
+    @Pattern(regexp="(\\d{5})", message = "Zip code must be numerical and have a length of 5")
     private String zipCode;
 
     public Address() {
@@ -68,5 +70,16 @@ public class Address {
 
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "country='" + country + '\'' +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", number=" + number +
+                ", zipCode='" + zipCode + '\'' +
+                '}';
     }
 }

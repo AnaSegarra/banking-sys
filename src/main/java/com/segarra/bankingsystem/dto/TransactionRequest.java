@@ -1,11 +1,14 @@
 package com.segarra.bankingsystem.dto;
 
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 public class TransactionRequest {
     private String recipientName;
+    @Min(value = 1, message = "Recipient account id must be a valid number greater thant 0")
     private int recipientId;
+    @Min(value = 1, message = "Sender account id must be a valid number greater thant 0")
     private int senderId;
     @DecimalMin(value = "0", message = "Transaction amount must be above 0", inclusive = false)
     private BigDecimal amount;

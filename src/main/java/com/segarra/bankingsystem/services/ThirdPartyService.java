@@ -1,7 +1,7 @@
 package com.segarra.bankingsystem.services;
 
+import com.segarra.bankingsystem.dto.ThirdPartyUserVM;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
-import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.Role;
 import com.segarra.bankingsystem.models.ThirdPartyUser;
 import com.segarra.bankingsystem.models.User;
@@ -28,11 +28,11 @@ public class ThirdPartyService {
     private static final Logger LOGGER = LogManager.getLogger(AccountHolderService.class);
 
     @Secured({"ROLE_ADMIN"})
-    public ThirdPartyUser create(ThirdPartyUser thirdPartyUser){
+    public ThirdPartyUserVM create(ThirdPartyUser thirdPartyUser){
         User foundUser = userRepository.findByUsername(thirdPartyUser.getUsername());
         if(foundUser != null){
-            LOGGER.info("Username taken - throw exception; status code 400");
-            throw new IllegalInputException("This username has already been taken");
+            LOGGER.error("Controlled exception - Username " + thirdPartyUser.getUsername() + " is already taken");
+            throw new IllegalInputException("Username " + thirdPartyUser.getUsername() + " is already taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         thirdPartyUser.setPassword(passwordEncoder.encode(thirdPartyUser.getPassword()));
@@ -40,6 +40,6 @@ public class ThirdPartyService {
         Role role = new Role("ROLE_THIRDPARTY", newUser);
         roleRepository.save(role);
         LOGGER.info("Third party user created " + newUser);
-        return newUser;
+        return new ThirdPartyUserVM(newUser.getId(), newUser.getUsername());
     }
 }

@@ -2,6 +2,9 @@ package com.segarra.bankingsystem.security;
 
 import com.segarra.bankingsystem.models.Role;
 import com.segarra.bankingsystem.models.User;
+import com.segarra.bankingsystem.services.AccountHolderService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +15,9 @@ import java.util.Set;
 
 public class CustomSecurityUser extends User implements UserDetails {
     private static final long serialVersionUID = -4381938875186527688L;
+    private static final Logger LOGGER = LogManager.getLogger(CustomSecurityUser.class);
 
     public CustomSecurityUser(User user) {
-        System.out.println(user);
         this.setRoles(user.getRoles());
         this.setId(user.getId());
         this.setPassword(user.getPassword());
@@ -25,10 +28,8 @@ public class CustomSecurityUser extends User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new HashSet<>();
         Set<Role> roles = this.getRoles();
-        System.out.println(this);
+        LOGGER.info("Logged user - " + this);
         for( Role role : roles ) {
-
-            System.out.println(role.getRole());
             authorities.add( new SimpleGrantedAuthority(role.getRole()) );
         }
         return authorities;

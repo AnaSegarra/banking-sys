@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +21,8 @@ import java.time.Period;
 public class CheckingAccount extends Account {
     private final BigDecimal monthlyMaintenanceFee = new BigDecimal("12");
     private final BigDecimal minimumBalance = new BigDecimal("250");
-    private int secretKey;
+    @NotNull(message = "Secret key required")
+    private String secretKey;
     @Enumerated(value = EnumType.STRING)
     private Status status;
     private LocalDateTime lastFeeApplied;
@@ -31,14 +33,14 @@ public class CheckingAccount extends Account {
     }
 
     public CheckingAccount(AccountHolder primaryOwner, AccountHolder secondaryOwner,
-                           Money balance, int secretKey) {
+                           Money balance, String secretKey) {
         super(primaryOwner, secondaryOwner, balance);
         this.secretKey = secretKey;
         this.status = Status.ACTIVE;
         this.lastFeeApplied = LocalDateTime.now();
     }
 
-    public CheckingAccount(AccountHolder primaryOwner, Money balance, int secretKey) {
+    public CheckingAccount(AccountHolder primaryOwner, Money balance, String secretKey) {
         super(primaryOwner, balance);
         this.secretKey = secretKey;
         this.status = Status.ACTIVE;
@@ -54,11 +56,11 @@ public class CheckingAccount extends Account {
         return minimumBalance;
     }
 
-    public int getSecretKey() {
+    public String getSecretKey() {
         return secretKey;
     }
 
-    public void setSecretKey(int secretKey) {
+    public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
 
@@ -93,11 +95,10 @@ public class CheckingAccount extends Account {
 
     @Override
     public String toString() {
-        return "CheckingAccount{" +
+        return "CheckingAccount {" +
                 "id=" + id +
-                ", primaryOwner=" + primaryOwner +
-                ", secondaryOwner=" + secondaryOwner +
                 ", balance=" + balance +
+                ", status=" + status +
                 '}';
     }
 }

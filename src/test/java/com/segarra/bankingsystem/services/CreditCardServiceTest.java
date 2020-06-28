@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,12 +43,13 @@ class CreditCardServiceTest {
 
         CreditCard creditCard = new CreditCard(accountHolder2,
                 new Money(new BigDecimal("2000")), new BigDecimal("200"), new BigDecimal("0.2"));
-        CreditCard creditCard2 = new CreditCard(accountHolder2,
+        CreditCard creditCard2 = new CreditCard(accountHolder,
                 new Money(new BigDecimal("5000")), new BigDecimal("300"), new BigDecimal("0.15"));
         creditCardList = Arrays.asList(creditCard, creditCard2);
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Unit test - retrieval of all credit cards")
     void getAll() {
         when(creditCardRepository.findAll()).thenReturn(creditCardList);

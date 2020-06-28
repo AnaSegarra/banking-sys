@@ -1,5 +1,8 @@
 package com.segarra.bankingsystem.services;
 
+import com.segarra.bankingsystem.dto.AccountHolderVM;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import com.segarra.bankingsystem.models.AccountHolder;
 import com.segarra.bankingsystem.models.Role;
 import com.segarra.bankingsystem.repositories.AccountHolderRepository;
@@ -55,7 +58,7 @@ class AccountHolderServiceTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    @DisplayName("Unit test - signup of new account holder")
+    @DisplayName("Unit test - create new account holder")
     void create() {
         AccountHolder accountHolder = new AccountHolder("Sergio", LocalDate.of(2020, 1, 28),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28700"), "1234", "gabi_c");
@@ -63,7 +66,7 @@ class AccountHolderServiceTest {
         when(accountHolderRepository.save(any(AccountHolder.class))).thenReturn(accountHolder);
         when(roleRepository.save(any(Role.class))).thenReturn(role);
 
-        AccountHolder savedAccHolder = accountHolderService.create(accountHolder);
+        AccountHolderVM savedAccHolder = accountHolderService.create(accountHolder);
         assertEquals("Sergio", savedAccHolder.getName());
     }
 }

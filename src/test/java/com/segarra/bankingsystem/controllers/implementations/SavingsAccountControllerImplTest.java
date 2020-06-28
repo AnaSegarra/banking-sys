@@ -21,6 +21,8 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +39,7 @@ class SavingsAccountControllerImplTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
 
         AccountHolder accountHolder2 = new AccountHolder("Gema", LocalDate.of(1991, 10, 20),
                 new Address("Spain", "Madrid", "Luna Avenue", 13, "28200"), "1234", "gema_s");
@@ -46,9 +48,9 @@ class SavingsAccountControllerImplTest {
         accountHolderRepository.saveAll(Stream.of(accountHolder, accountHolder2).collect(Collectors.toList()));
 
         SavingsAccount savingsAccount = new SavingsAccount(accountHolder2,
-                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), 1234, new BigDecimal("200"));
+                new Money(new BigDecimal("2000")), new BigDecimal("0.15"), "1234", new BigDecimal("200"));
         SavingsAccount savingsAccount2 = new SavingsAccount(accountHolder,
-                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), 1234, new BigDecimal("800"));
+                new Money(new BigDecimal("2000")), new BigDecimal("0.5"), "1234", new BigDecimal("800"));
 
         savingsAccountRepository.saveAll(Stream.of(savingsAccount, savingsAccount2).collect(Collectors.toList()));
     }
@@ -62,6 +64,7 @@ class SavingsAccountControllerImplTest {
     @Test
     @DisplayName("Test get request to retrieve all savings accounts")
     void getAll() throws Exception {
-        mockMvc.perform(get("/api/v1/savings-accounts")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/savings-accounts")
+                .with(user("admin").roles("ADMIN"))).andExpect(status().isOk());
     }
 }

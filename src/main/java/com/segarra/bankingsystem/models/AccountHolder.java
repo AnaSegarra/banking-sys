@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "account_holders")
 public class AccountHolder extends User{
     @NotBlank(message = "Name is required")
     private String name;
@@ -106,10 +105,11 @@ public class AccountHolder extends User{
 
     @Override
     public String toString() {
-        return "AccountHolder {" +
+        return "{" +
                 "name='" + name + '\'' +
                 ", birthday=" + birthday +
-                ", username=" + getUsername() +
+                ", primaryAddress=" + primaryAddress +
+                ", mailingAddress=" + mailingAddress +
                 '}';
     }
 }

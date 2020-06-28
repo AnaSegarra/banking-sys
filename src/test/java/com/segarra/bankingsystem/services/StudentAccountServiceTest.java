@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,13 +40,14 @@ class StudentAccountServiceTest {
                 new Address("Spain", "Madrid", "Luna Avenue", 8, "28700"), "1234", "ana_s");
 
         StudentAccount studentAccount = new StudentAccount(accountHolder,
-                new Money(new BigDecimal("2000")), 1234);
+                new Money(new BigDecimal("2000")), "1234");
         StudentAccount studentAccount2 = new StudentAccount(accountHolder2,
-                new Money(new BigDecimal("5000")), 1234);
+                new Money(new BigDecimal("5000")), "1234");
         studentAccountList = Arrays.asList(studentAccount, studentAccount2);
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Unit test - retrieval of all student accounts")
     void getAll() {
         when(studentAccountRepository.findAll()).thenReturn(studentAccountList);

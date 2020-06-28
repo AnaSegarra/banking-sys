@@ -1,6 +1,8 @@
 package com.segarra.bankingsystem.models;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
@@ -10,6 +12,8 @@ public class Money {
     private static final Currency USD = Currency.getInstance("USD");
     private static final RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_EVEN;
     private final Currency currency;
+    @NotNull(message = "Balance amount is required")
+    @DecimalMin(message = "Balance must be greater than 0", value = "0", inclusive = false)
     private BigDecimal amount;
 
     // default constructor

@@ -1,6 +1,7 @@
 package com.segarra.bankingsystem.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -11,7 +12,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "account_holders")
-public class AccountHolder extends User{
+public class AccountHolder {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     @NotBlank(message = "Name is required")
     private String name;
     @NotNull(message = "Birthday is required")
@@ -36,24 +40,23 @@ public class AccountHolder extends User{
     @OneToMany(mappedBy = "secondaryOwner")
     @JsonIgnore
     private List<Account> secondaryAccounts;
+    @OneToOne
+    private AccountUser accountUser;
 
     public AccountHolder() {
     }
 
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password, String username) {
-        super(username, password);
-        this.name = name;
-        this.birthday = birthday;
-        this.primaryAddress = primaryAddress;
-    }
-
-    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, String password,
-                         String username, Address mailingAddress) {
-        super(username, password);
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress, Address mailingAddress) {
         this.name = name;
         this.birthday = birthday;
         this.primaryAddress = primaryAddress;
         this.mailingAddress = mailingAddress;
+    }
+
+    public AccountHolder(String name, LocalDate birthday, Address primaryAddress) {
+        this.name = name;
+        this.birthday = birthday;
+        this.primaryAddress = primaryAddress;
     }
 
     public List<Account> getAccounts() {
@@ -103,6 +106,23 @@ public class AccountHolder extends User{
     public void setMailingAddress(Address mailingAddress) {
         this.mailingAddress = mailingAddress;
     }
+
+    public AccountUser getAccountUser() {
+        return accountUser;
+    }
+
+    public void setAccountUser(AccountUser accountUser) {
+        this.accountUser = accountUser;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 
     @Override
     public String toString() {

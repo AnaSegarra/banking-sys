@@ -1,17 +1,16 @@
 package com.segarra.bankingsystem.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class User {
+@Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private int id;
     @NotNull(message = "A username is required")
     private String username;

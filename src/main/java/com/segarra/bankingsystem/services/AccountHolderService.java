@@ -1,5 +1,6 @@
 package com.segarra.bankingsystem.services;
 
+import com.segarra.bankingsystem.dto.AccountHolderRequest;
 import com.segarra.bankingsystem.dto.AccountHolderVM;
 import com.segarra.bankingsystem.exceptions.IllegalInputException;
 import com.segarra.bankingsystem.models.*;
@@ -32,24 +33,28 @@ public class AccountHolderService {
         LOGGER.info("Admin GET request to retrieve every account holder");
         return accountHolderRepository.findAll().stream()
                 .map(accountHolder -> new AccountHolderVM(accountHolder.getId(), accountHolder.getName(),
-                        accountHolder.getUsername(), accountHolder.getBirthday(), accountHolder.getPrimaryAddress(),
+                        accountHolder.getBirthday(), accountHolder.getPrimaryAddress(),
                         accountHolder.getMailingAddress())).collect(Collectors.toList());
     }
 
     // create new account holder - admin restricted
     @Secured({"ROLE_ADMIN"})
-    public AccountHolder create(AccountHolder accountHolder){
-        User foundUser = userRepository.findByUsername(accountHolder.getUsername());
+    public AccountHolderVM create(AccountHolderRequest newUser){
+        User foundUser = userRepository.findByUsername(newUser.getUsername());
         if(foundUser != null){
-            LOGGER.error("Controlled exception - Username " + accountHolder.getUsername() + " is already taken");
-            throw new IllegalInputException("Username " + accountHolder.getUsername() + " is already taken");
+            LOGGER.error("Controlled exception - Username " + newUser.getUsername() + " is already taken");
+            throw new IllegalInputException("Username " + newUser.getUsername() + " is already taken");
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        accountHolder.setPassword(passwordEncoder.encode(accountHolder.getPassword()));
-        AccountHolder newUser = accountHolderRepository.save(accountHolder);
-        Role role = new Role("ROLE_ACCOUNTHOLDER", newUser);
+        AccountHolder accountHolder = new AccountHolder(newUser.getUsername(), newUser.getBirthday(), newUser.getPrimaryAddress(), newUser.getMailingAddress());
+        accountHolderRepository.save(accountHolder);
+        AccountUser accountUser = new AccountUser(newUser.getUsername(), passwordEncoder.encode(newUser.getPassword()), accountHolder);
+        userRepository.save(accountUser);
+        Role role = new Role("ROLE_ACCOUNTHOLDER", accountUser);
         roleRepository.save(role);
         LOGGER.info("Account holder created " + newUser);
-        return newUser;
+
+        return new AccountHolderVM(accountHolder.getId(), accountHolder.getName(), accountHolder.getBirthday(),
+                accountHolder.getPrimaryAddress(), accountHolder.getMailingAddress());
     }
 }

@@ -224,9 +224,12 @@ public class AccountService {
     public void applyFinance(Account account, String operation, BigDecimal amount){
         if(operation.equals("debit")){
             account.getBalance().decreaseAmount(amount);
+            LOGGER.info("Admin process a debit of " + amount + " on account " + account.getId());
         } else if (operation.equals("credit")){
             account.getBalance().increaseAmount(amount);
+            LOGGER.info("Admin process a credit of " + amount + " on account " + account.getId());
         } else {
+            LOGGER.error("");
             throw new IllegalInputException("Must enter a valid operation of either debit or credit");
         }
     }

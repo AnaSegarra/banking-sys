@@ -1,6 +1,7 @@
 package com.segarra.bankingsystem.controllers.implementations;
 
 import com.segarra.bankingsystem.controllers.interfaces.ThirdPartyController;
+import com.segarra.bankingsystem.dto.ThirdPartyUserVM;
 import com.segarra.bankingsystem.models.ThirdPartyUser;
 import com.segarra.bankingsystem.services.ThirdPartyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class ThirdPartyControllerImpl implements ThirdPartyController {
 
     @PostMapping("/third-parties")
     @ResponseStatus(HttpStatus.CREATED)
-    public ThirdPartyUser create(@Valid @RequestBody ThirdPartyUser thirdPartyUser) {
+    public ThirdPartyUserVM create(@RequestBody @Valid  ThirdPartyUser thirdPartyUser) {
         return thirdPartyService.create(thirdPartyUser);
     }
 }

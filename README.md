@@ -62,7 +62,7 @@ Full API documentation can be found at [https://documenter.getpostman.com/view/1
 
 ## Overview
 
-This is the first of two projects to be made during the Ironhack Java Bootcamp in Junee of 2020.
+This is the first of two projects to be made during the Ironhack Java Bootcamp in June of 2020.
 
 ## Author
 
